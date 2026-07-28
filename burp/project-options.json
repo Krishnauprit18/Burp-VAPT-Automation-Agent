@@ -1,0 +1,29 @@
+{
+  "proxy": {
+    "request_listeners": [
+      {
+        "certificate_mode": "per_host",
+        "enable_http2": true,
+        "listen_mode": "all_interfaces",
+        "listener_port": 8080,
+        "running": true
+      }
+    ]
+  },
+  "target": {
+    "scope": {
+      "advanced_mode": true,
+      "include": [
+        {"enabled": true, "host": "^ofbiz$", "port": "^8443$", "protocol": "https"}
+      ],
+      "exclude": []
+    }
+  },
+  "project_options": {
+    "connections": {
+      "upstream_proxy": {
+        "use_user_options": false
+      }
+    }
+  }
+}

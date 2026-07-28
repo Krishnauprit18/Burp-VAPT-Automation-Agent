@@ -1,0 +1,11 @@
+{
+  "extensions": {
+    "extensions": [
+      {
+        "extension_file": "/opt/burp/extensions/burp-agent-bridge.jar",
+        "extension_type": "java",
+        "loaded": true
+      }
+    ]
+  }
+}

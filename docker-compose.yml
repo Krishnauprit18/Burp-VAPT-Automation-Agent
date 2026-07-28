@@ -1,0 +1,56 @@
+services:
+  ofbiz:
+    build:
+      context: ${OFBIZ_SOURCE}
+    container_name: ofbiz-agent-ofbiz
+    networks: [agentnet]
+    ports:
+      - "8443:8443"
+    volumes:
+      - ofbiz-runtime:/ofbiz/runtime
+    restart: unless-stopped
+
+  burp:
+    build: ./burp
+    container_name: ofbiz-agent-burp
+    networks: [agentnet]
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
+      BURP_BRIDGE_PORT: ${BURP_BRIDGE_PORT:-1338}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - burp-home:/home/burp
+      - ./burp-extension/target/burp-agent-bridge.jar:/opt/burp/extensions/burp-agent-bridge.jar:ro
+      - ./artifacts:/artifacts
+    ports:
+      - "127.0.0.1:${BURP_PROXY_PORT:-8080}:8080"
+      - "127.0.0.1:${BURP_BRIDGE_PORT:-1338}:${BURP_BRIDGE_PORT:-1338}"
+    depends_on: [ofbiz]
+    restart: unless-stopped
+
+  capture-agent:
+    build: ./agent
+    container_name: ofbiz-agent-capture
+    networks: [agentnet]
+    environment:
+      OFBIZ_URL: ${OFBIZ_URL:-https://ofbiz:8443/webtools/control/checkLogin}
+      OFBIZ_USERNAME: ${OFBIZ_USERNAME:-admin}
+      OFBIZ_PASSWORD: ${OFBIZ_PASSWORD:-ofbiz}
+      BURP_PROXY: http://burp:8080
+      BURP_BRIDGE_URL: http://burp:${BURP_BRIDGE_PORT:-1338}
+      BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
+      BURP_TARGET_HOST: ofbiz
+    volumes:
+      - ./artifacts:/artifacts
+      - ./workflows:/app/workflows:ro
+    depends_on: [burp]
+    profiles: [run]
+
+networks:
+  agentnet:
+    name: ofbiz-agent-network
+
+volumes:
+  ofbiz-runtime:
+  burp-home:

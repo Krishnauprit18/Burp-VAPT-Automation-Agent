@@ -1,0 +1,35 @@
+# ── Secrets ──────────────────────────────────────────────────
+.env
+
+# ── Burp JAR (large binary, not redistributable) ─────────────
+burp/burpsuite*.jar
+burp/burpsuite_pro.jar
+
+# ── Maven build output ────────────────────────────────────────
+burp-extension/target/
+
+# ── Python venv ───────────────────────────────────────────────
+.venv-agent/
+__pycache__/
+*.pyc
+*.pyo
+
+# ── Scan artifacts (generated output) ────────────────────────
+artifacts/
+
+# ── ZAP leftovers ─────────────────────────────────────────────
+*.session
+*.session.backup
+*.session.data
+*.session.lck
+*.session.log
+*.session.properties
+*.session.script
+*.session.tmp
+zap-*.html
+zap-*.json
+
+# ── Misc ──────────────────────────────────────────────────────
+*.log
+*.class
+.DS_Store

@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.krishna</groupId><artifactId>burp-agent-bridge</artifactId><version>1.0.0</version>
+  <properties><maven.compiler.release>21</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <dependencies>
+    <dependency><groupId>net.portswigger.burp.extensions</groupId><artifactId>montoya-api</artifactId><version>2026.7</version><scope>provided</scope></dependency>
+  </dependencies>
+  <build>
+    <finalName>burp-agent-bridge</finalName>
+    <plugins>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version></plugin>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.4.2</version><configuration><archive><manifestEntries><Burp-Extension-Class>com.krishna.burpagent.BurpAgentExtension</Burp-Extension-Class></manifestEntries></archive></configuration></plugin>
+    </plugins>
+  </build>
+</project>
