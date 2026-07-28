@@ -155,16 +155,15 @@ if [[ ! -d "$VENV" ]]; then
 fi
 source "$VENV/bin/activate"
 pip install -q --upgrade pip
-pip install -q playwright==1.54.0 requests==2.32.4
-playwright install chromium > /dev/null 2>&1 || true
-success "Python env ready"
+pip install -q requests==2.32.4
+success "Python env ready (Playwright not needed — Burp crawls natively)"
 
 echo ""
 info "Scan chal raha hai — terminal band mat karo..."
 echo ""
 
-export OFBIZ_URL="https://ofbiz:8443/webtools/control/main"
-export BURP_PROXY="http://localhost:${PROXY_PORT}"
+export OFBIZ_URL="https://ofbiz:8443/webtools/control/main,https://ofbiz:8443/accounting/control/main,https://ofbiz:8443/catalog/control/main,https://ofbiz:8443/ordermgr/control/main,https://ofbiz:8443/partymgr/control/main,https://ofbiz:8443/facility/control/main,https://ofbiz:8443/content/control/main,https://ofbiz:8443/manufacturing/control/main,https://ofbiz:8443/sfa/control/main,https://ofbiz:8443/workeffort/control/main"
+export TARGET_HOST="ofbiz"
 export BURP_BRIDGE_URL="http://localhost:${BRIDGE_PORT}"
 export ARTIFACTS_DIR="$(pwd)/artifacts"
 

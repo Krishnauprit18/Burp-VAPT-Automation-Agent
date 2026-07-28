@@ -2,101 +2,79 @@ import json, os, time
 from pathlib import Path
 import requests
 
-# ── Environment ────────────────────────────────────────────────────────────────
-URL         = os.environ.get("OFBIZ_URL", "https://ofbiz:8443/webtools/control/checkLogin")
-BRIDGE      = os.environ.get("BURP_BRIDGE_URL", "http://burp:1338")
-TOKEN       = os.environ.get("BURP_BRIDGE_TOKEN", "")
-TARGET_HOST = os.environ.get("BURP_TARGET_HOST", "ofbiz")
-HEAD        = {"Authorization": "Bearer " + TOKEN}
-ART         = Path(os.environ.get("ARTIFACTS_DIR", "/artifacts"))
+URL    = os.environ["OFBIZ_URL"]
+BRIDGE = os.environ["BURP_BRIDGE_URL"]
+HEAD   = {"Authorization": "Bearer " + os.environ["BURP_BRIDGE_TOKEN"]}
+HOST   = os.environ.get("TARGET_HOST", "ofbiz")
+ART    = Path(os.environ.get("ARTIFACTS_DIR", "/artifacts"))
 ART.mkdir(parents=True, exist_ok=True)
 
-
 def wait_health():
-    """Poll the Burp bridge /health endpoint until it responds."""
-    print(f"[*] Waiting for Burp bridge at {BRIDGE} ...", flush=True)
-    for attempt in range(120):
+    print("[*] Waiting for Burp Bridge...")
+    for _ in range(120):
         try:
             r = requests.get(BRIDGE + "/health", headers=HEAD, timeout=3)
             if r.ok:
-                print(f"[✓] Burp bridge ready: {r.json()}", flush=True)
+                print(f"[✓] Bridge ready: {r.json()}")
                 return
         except requests.RequestException:
             pass
         time.sleep(2)
-    raise RuntimeError(f"Burp bridge not ready after 240 s at {BRIDGE}")
+    raise RuntimeError("Burp Bridge not ready after 4 minutes")
 
-
-def run_native_crawl():
-    """Trigger Burp's Native Automated Crawler on the target seed URL."""
-    print(f"[*] Triggering Burp Native Crawl on seed URL: {URL} ...", flush=True)
-    r = requests.post(BRIDGE + f"/crawl/start?url={URL}", headers=HEAD, timeout=30)
-    r.raise_for_status()
-    crawl_id = r.json()["crawlId"]
-    print(f"[✓] Burp Native Crawl task started: id={crawl_id}", flush=True)
-
-    # Poll Crawl status until finished
-    while True:
-        try:
-            s = requests.get(BRIDGE + f"/crawl/status?id={crawl_id}", headers=HEAD, timeout=30)
-            s.raise_for_status()
-            data = s.json()
-            (ART / "crawl-status.json").write_text(json.dumps(data, indent=2))
-            print(f"  [Crawl Progress] {data}", flush=True)
-            if data.get("complete") or data.get("requests", 0) > 0:
-                # Crawl initial phase triggered or completed
-                break
-        except requests.RequestException as err:
-            print(f"[!] Crawl status poll retry: {err}", flush=True)
-        time.sleep(10)
-    print("[✓] Crawling Phase Completed", flush=True)
-
-
-def run_active_audit():
-    """Trigger Burp's Active Scanner on the discovered Site Tree."""
-    print(f"[*] Fetching site-map for host '{TARGET_HOST}'...", flush=True)
-    sm = requests.get(BRIDGE + f"/site-map?host={TARGET_HOST}", headers=HEAD, timeout=30)
-    sm.raise_for_status()
-    (ART / "site-map.json").write_text(json.dumps(sm.json(), indent=2))
-    count = sm.json().get("count", 0)
-    print(f"[✓] Site-map captured: {count} endpoints", flush=True)
-
-    print("[*] Starting Burp Active Audit on target site tree...", flush=True)
-    r = requests.post(BRIDGE + f"/audit/start?host={TARGET_HOST}", headers=HEAD, timeout=30)
-    r.raise_for_status()
-    audit_id = r.json()["auditId"]
-    print(f"[✓] Active Audit started: id={audit_id}, queued={r.json().get('queuedItems', '?')}", flush=True)
-
-    # Poll Audit status until complete
-    while True:
-        try:
-            s = requests.get(BRIDGE + f"/audit/status?id={audit_id}", headers=HEAD, timeout=30)
-            s.raise_for_status()
-            data = s.json()
-            (ART / "audit-status.json").write_text(json.dumps(data, indent=2))
-            print(f"  [Audit Progress] {data}", flush=True)
-            if data.get("complete"):
-                break
-        except requests.RequestException as err:
-            print(f"[!] Audit status poll retry: {err}", flush=True)
-        time.sleep(10)
-
-    # Generate Final Report
-    print("[*] Exporting Final VAPT HTML Report...", flush=True)
-    rep = requests.post(BRIDGE + f"/audit/report?id={audit_id}", headers=HEAD, timeout=120)
-    rep.raise_for_status()
-    (ART / "run-summary.json").write_text(
-        json.dumps({"auditId": audit_id, "report": rep.json()}, indent=2)
+def start_scan():
+    print(f"[*] Starting Burp crawl+audit on {URL} ...")
+    r = requests.post(
+        BRIDGE + "/scan/start",
+        headers=HEAD,
+        params={"url": URL, "host": HOST},
+        timeout=30
     )
-    print(f"[✓] Automated VAPT Pipeline Completed! Report: artifacts/burp-active-scan-report.html", flush=True)
+    r.raise_for_status()
+    data = r.json()
+    print(f"[✓] Scan started: {data}")
+    return data["scanId"]
 
+def poll_status(scan_id):
+    print("[*] Polling scan status (crawl → audit → complete)...")
+    fail_count = 0
+    while True:
+        try:
+            s = requests.get(BRIDGE + f"/scan/status?id={scan_id}", headers=HEAD, timeout=30)
+            s.raise_for_status()
+            data = s.json()
+            fail_count = 0  # reset on success
+            (ART / "scan-status.json").write_text(json.dumps(data, indent=2))
+            print(f"    {data}", flush=True)
+            if data.get("complete"):
+                return data
+            if data.get("error"):
+                raise RuntimeError(f"Scan error: {data['error']}")
+        except requests.RequestException as e:
+            fail_count += 1
+            print(f"    [!] Poll failed ({fail_count}/5): {e}", flush=True)
+            if fail_count >= 5:
+                raise RuntimeError(f"Bridge unreachable after 5 retries: {e}")
+            time.sleep(5)
+            continue
+        time.sleep(15)
+
+def get_report(scan_id):
+    print("[*] Generating report...")
+    r = requests.post(BRIDGE + f"/scan/report?id={scan_id}", headers=HEAD, timeout=120)
+    r.raise_for_status()
+    data = r.json()
+    (ART / "run-summary.json").write_text(json.dumps({"scanId": scan_id, "report": data}, indent=2))
+    print(f"[✓] Report saved: {data['path']}  |  Issues: {data['issues']}")
+    return data
 
 def main():
     wait_health()
-    run_native_crawl()
-    time.sleep(5)
-    run_active_audit()
-
+    scan_id = start_scan()
+    status  = poll_status(scan_id)
+    report  = get_report(scan_id)
+    print(f"\n[✓] DONE — Issues found: {report['issues']}")
+    print(f"    Report: {report['path']}")
 
 if __name__ == "__main__":
     main()

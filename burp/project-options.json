@@ -14,15 +14,43 @@
     "scope": {
       "advanced_mode": true,
       "include": [
-        {"enabled": true, "host": "^ofbiz$", "port": "^8443$", "protocol": "https"}
+        {
+          "enabled": true,
+          "host": "^ofbiz$",
+          "port": "^8443$",
+          "protocol": "https"
+        }
       ],
-      "exclude": []
+      "exclude": [
+        {
+          "enabled": true,
+          "host": "^ofbiz$",
+          "port": "^8443$",
+          "protocol": "https",
+          "file": ".*(logout|Logout).*"
+        }
+      ]
     }
+  },
+  "scanner": {
+    "application_logins": [
+      {
+        "enabled": true,
+        "type": "UsernameAndPasswordCredentials",
+        "username": "admin",
+        "password": "ofbiz"
+      }
+    ]
   },
   "project_options": {
     "connections": {
       "upstream_proxy": {
         "use_user_options": false
+      },
+      "ssl": {
+        "disable_http2": false,
+        "enable_sni": true,
+        "negotiate_alpn": true
       }
     }
   }
