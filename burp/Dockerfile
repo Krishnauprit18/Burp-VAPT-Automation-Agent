@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jre-jammy
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 libxrender1 libxtst6 libxi6 libx11-6 libxrandr2 libxfixes3 \
-    libxdamage1 libxcomposite1 libgtk-3-0 libnss3 libasound2 ca-certificates \
+    libxdamage1 libxcomposite1 libgtk-3-0 libnss3 libasound2 ca-certificates jq \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -m -u 1000 burp
 WORKDIR /opt/burp

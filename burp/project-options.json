@@ -37,8 +37,8 @@
       {
         "enabled": true,
         "type": "UsernameAndPasswordCredentials",
-        "username": "admin",
-        "password": "ofbiz"
+        "username": "__RUNTIME_USERNAME__",
+        "password": "__RUNTIME_PASSWORD__"
       }
     ]
   },

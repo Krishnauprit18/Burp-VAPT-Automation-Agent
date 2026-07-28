@@ -1,59 +1,50 @@
 #!/usr/bin/env bash
-# ============================================================
-# OFBiz Burp VAPT — Single Automated Pipeline Launcher
-# ============================================================
 set -euo pipefail
 cd "$(dirname "$0")"
 
-GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
+fail() { echo "[x] $*" >&2; exit 1; }
+info() { echo "[*] $*"; }
 
-echo ""
-echo -e "${CYAN}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║    OFBiz + Burp Suite Pro Automated VAPT Pipeline        ║${NC}"
-echo -e "${CYAN}╚══════════════════════════════════════════════════════════╝${NC}"
-echo ""
+[[ -f .env ]] || fail "Create .env from .env.example and replace every placeholder."
+command -v docker >/dev/null || fail "docker is required"
+docker compose version >/dev/null 2>&1 || fail "Docker Compose v2 is required"
+[[ -f burp/burpsuite_pro.jar ]] || fail "Place your licensed Burp Professional JAR at burp/burpsuite_pro.jar"
 
-# 1. Environment check
-[[ -f .env ]] || cp .env.example .env
-set -a; source .env; set +a
-
-# 2. Check Burp Pro JAR
-if [[ ! -f burp/burpsuite_pro.jar ]]; then
-    JAR=$(ls burp/burpsuite*.jar 2>/dev/null | grep -v "burpsuite_pro.jar" | head -1)
-    if [[ -n "$JAR" ]]; then
-        ln -sf "$(basename "$JAR")" burp/burpsuite_pro.jar
-        echo -e "${GREEN}[✓] Burp JAR linked: $(basename "$JAR")${NC}"
-    else
-        echo -e "${RED}[✗] Missing burpsuite_pro.jar in burp/ directory.${NC}"
-        exit 1
-    fi
+if grep -Eq 'replace-me|replace-with|/absolute/path' .env; then
+    fail ".env still contains example placeholders"
 fi
 
-# 3. Build Extension JAR
-echo -e "${CYAN}[*] Step 1/3: Building Burp Extension...${NC}"
-./build.sh > /dev/null
+mkdir -p artifacts
 
-# 4. Start Containers
-echo -e "${CYAN}[*] Step 2/3: Starting OFBiz & Burp Containers...${NC}"
+info "Building the Montoya extension"
+./build.sh
+
+info "Building containers"
+docker compose --profile run build ofbiz burp capture-agent
+
+info "Stopping any previous scan containers"
+docker compose down --remove-orphans
+
+if docker volume inspect burp-vapt-ofbiz-runtime >/dev/null 2>&1; then
+    info "Removing the previous isolated OFBiz runtime volume"
+    docker volume rm burp-vapt-ofbiz-runtime >/dev/null
+fi
+
+info "Creating a fresh Burp project while retaining Burp licence data"
+docker compose run --rm --no-deps --entrypoint sh burp -c \
+  'rm -f /home/burp/ofbiz-agent.burp /home/burp/ofbiz-agent.burp.backup /home/burp/ofbiz-agent.burp.lck'
+
 xhost +SI:localuser:"$(id -un)" >/dev/null 2>&1 || true
-docker compose up -d --build ofbiz burp
 
-echo ""
-echo -e "${YELLOW}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${YELLOW}║  ACTION REQUIRED (One-time in Burp GUI):                 ║${NC}"
-echo -e "${YELLOW}║                                                          ║${NC}"
-echo -e "${YELLOW}║  1. In Burp Suite UI window -> Extensions -> Installed   ║${NC}"
-echo -e "${YELLOW}║  2. Click 'Add' -> Select Type: Java                     ║${NC}"
-echo -e "${YELLOW}║  3. File: /opt/burp/extensions/burp-agent-bridge.jar     ║${NC}"
-echo -e "${YELLOW}╚══════════════════════════════════════════════════════════╝${NC}"
-echo ""
-read -r -p "Press ENTER once extension is loaded in Burp UI > "
-echo ""
+info "Starting OFBiz and Burp"
+docker compose up -d ofbiz burp
 
-# 5. Run Automated Pipeline Agent (Native Crawl + Active Audit)
-echo -e "${CYAN}[*] Step 3/3: Running Burp Native Crawl & Active Scan...${NC}"
+info "Starting native Burp crawl followed by active audit"
 docker compose --profile run run --rm capture-agent
 
-echo ""
-echo -e "${GREEN}[✓] Pipeline execution finished!${NC}"
-echo -e "${GREEN}[✓] Report saved at: artifacts/burp-active-scan-report.html${NC}"
+report=$(find artifacts -maxdepth 1 -type f -name 'burp-vapt-report-*.html' -printf '%T@ %p\n' \
+  | sort -nr | head -1 | cut -d' ' -f2-)
+[[ -n "$report" ]] || fail "Scan finished but no report was generated"
+
+echo "[+] Scan complete"
+echo "[+] Report: $report"

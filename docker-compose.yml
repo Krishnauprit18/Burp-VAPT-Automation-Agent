@@ -18,6 +18,12 @@ services:
       DISPLAY: ${DISPLAY:-:0}
       BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
       BURP_BRIDGE_PORT: ${BURP_BRIDGE_PORT:-1338}
+      OFBIZ_USERNAME: ${OFBIZ_USERNAME}
+      OFBIZ_PASSWORD: ${OFBIZ_PASSWORD}
+      TARGET_HOST: ${TARGET_HOST:-ofbiz}
+      CRAWL_IDLE_SECONDS: ${CRAWL_IDLE_SECONDS:-180}
+      MAX_CRAWL_SECONDS: ${MAX_CRAWL_SECONDS:-7200}
+      MAX_AUDIT_SECONDS: ${MAX_AUDIT_SECONDS:-14400}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - burp-home:/home/burp
@@ -34,16 +40,14 @@ services:
     container_name: ofbiz-agent-capture
     networks: [agentnet]
     environment:
-      OFBIZ_URL: ${OFBIZ_URL:-https://ofbiz:8443/webtools/control/checkLogin}
-      OFBIZ_USERNAME: ${OFBIZ_USERNAME:-admin}
-      OFBIZ_PASSWORD: ${OFBIZ_PASSWORD:-ofbiz}
-      BURP_PROXY: http://burp:8080
+      SCAN_SEED_URLS: ${SCAN_SEED_URLS:-https://ofbiz:8443/webtools/control/main}
       BURP_BRIDGE_URL: http://burp:${BURP_BRIDGE_PORT:-1338}
       BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
-      BURP_TARGET_HOST: ofbiz
+      TARGET_HOST: ${TARGET_HOST:-ofbiz}
+      MAX_SCAN_SECONDS: ${MAX_SCAN_SECONDS:-18000}
+      SCAN_POLL_SECONDS: ${SCAN_POLL_SECONDS:-15}
     volumes:
       - ./artifacts:/artifacts
-      - ./workflows:/app/workflows:ro
     depends_on: [burp]
     profiles: [run]
 
@@ -53,4 +57,6 @@ networks:
 
 volumes:
   ofbiz-runtime:
+    name: burp-vapt-ofbiz-runtime
   burp-home:
+    name: burp-vapt-burp-home
