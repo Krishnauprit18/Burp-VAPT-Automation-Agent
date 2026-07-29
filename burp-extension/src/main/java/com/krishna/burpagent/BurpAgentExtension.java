@@ -2,14 +2,17 @@ package com.krishna.burpagent;
 
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
-import com.krishna.burpagent.server.RestSocketServer;
-import com.krishna.burpagent.service.AuditIssueMonitoringService;
+import com.krishna.burpagent.server.MontoyaBridgeServer;
+import com.krishna.burpagent.service.AuditIssueLoggingHandler;
 import com.krishna.burpagent.service.ConfigurationService;
-import com.krishna.burpagent.service.ScanEngineService;
+import com.krishna.burpagent.service.CrawlerSessionCoordinator;
+import com.krishna.burpagent.service.OFBizAuthenticationService;
+import com.krishna.burpagent.service.ReportAgent;
 import com.krishna.burpagent.service.SessionAuthenticationHandler;
 
 public final class BurpAgentExtension implements BurpExtension {
-    private RestSocketServer server;
+    private MontoyaBridgeServer server;
+    private OFBizAuthenticationService authenticationService;
 
     @Override
     public void initialize(MontoyaApi api) {
@@ -23,27 +26,33 @@ public final class BurpAgentExtension implements BurpExtension {
             }
             int port = Integer.parseInt(System.getenv().getOrDefault("BURP_BRIDGE_PORT", "1338"));
 
-            // 1. Initialize Autonomous Services & Security Handlers
-            SessionAuthenticationHandler sessionHandler = new SessionAuthenticationHandler(api, configService);
-            AuditIssueMonitoringService auditIssueHandler = new AuditIssueMonitoringService(api, configService);
-            ScanEngineService scanEngine = new ScanEngineService(api, configService, sessionHandler);
-            this.server = new RestSocketServer(api, configService, scanEngine, port, token);
+            this.authenticationService = new OFBizAuthenticationService(api, configService);
+            CrawlerSessionCoordinator sessionCoordinator = new CrawlerSessionCoordinator();
+            SessionAuthenticationHandler sessionHandler = new SessionAuthenticationHandler(
+                    configService, authenticationService, sessionCoordinator);
+            AuditIssueLoggingHandler auditIssueHandler = new AuditIssueLoggingHandler(api, configService);
+            ReportAgent reportAgent = new ReportAgent(api, configService);
+            this.server = new MontoyaBridgeServer(
+                    configService,
+                    authenticationService,
+                    sessionCoordinator,
+                    reportAgent,
+                    port,
+                    token);
 
-            // 2. Register Native Montoya Interception & Alerting Shields
             api.http().registerHttpHandler(sessionHandler);
             api.scanner().registerAuditIssueHandler(auditIssueHandler);
-            configService.injectAggressiveScanRules();
-            
-            // 3. Start REST Presentation Controller
+            authenticationService.startMonitoring();
             this.server.start();
 
-            String successMsg = "Modular Burp Bridge running on port " + port + " (Crawl + Active Audit Pipeline Armed)";
+            String successMsg = "Native Burp Java agents ready on loopback port " + port;
             configService.logDiagnostics(successMsg);
             api.logging().logToOutput(successMsg);
 
             api.extension().registerUnloadingHandler(() -> {
                 configService.logDiagnostics("Extension unloading, shutting down socket listeners.");
                 if (server != null) server.stop();
+                if (authenticationService != null) authenticationService.stop();
             });
         } catch (Throwable e) {
             configService.logDiagnostics("Fatal Startup Exception: " + e.getMessage());

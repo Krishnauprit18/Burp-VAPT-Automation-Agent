@@ -1,109 +1,152 @@
-# OFBiz + Burp Professional automated VAPT
+# OFBiz + native Burp Professional automated VAPT pipeline
 
-Deterministic, LLM-free automation for an authorised OFBiz test environment.
+Java-only automation for an authorised Apache OFBiz assessment. OFBiz runs in
+Docker while the existing licensed Burp Suite Professional installation runs
+natively with its normal desktop profile.
 
-## What one scan does
+## Architecture
 
-1. Builds and starts the selected OFBiz source tree in Docker.
-2. Starts the licensed Burp Suite Professional JAR in Docker.
-3. Automatically loads the local Java/Montoya bridge extension.
-4. Waits for OFBiz and Burp to become ready.
-5. Starts Burp's native browser-powered crawler from the configured seed URLs.
-6. Waits for crawler status or a bounded period with no new crawl requests.
-7. Collects the target host's authenticated Site Map entries.
-8. Starts a Burp active audit and waits with a hard timeout.
-9. Generates a uniquely named HTML report and JSON run metadata.
+The executable JAR has two roles:
 
-No browser-driving framework, manually captured traffic, or LLM is used.
+- its Java launcher deploys OFBiz, opens native Burp, starts and monitors the
+  scan through Burp's Desktop REST API, and coordinates the run;
+- the same JAR is loaded by Burp as a Montoya extension for request/response
+  session handling and Burp-native HTML/XML report generation.
 
-## Stack
+The production flow is:
 
-- Java 21 and the official Montoya API for in-process Burp control.
-- A small Python 3.12 coordinator for readiness checks and bridge polling.
-- Docker Compose for OFBiz, Burp, and coordinator lifecycle.
-- Bash for the single host-side entry point.
+1. `OfbizDeploymentAgent` starts the OFBiz demo container and waits for
+   `https://localhost:8443/webtools/control/main`.
+2. `NativeBurpAgent` opens the installed Burp executable with its normal user
+   profile and a new project under `artifacts/run-*`.
+3. `MontoyaBridgeServer` applies the project scope and prepares a verified
+   standby OFBiz admin session.
+4. `BurpRestClient` creates a native crawl-and-audit task with:
+   - the single WebTools seed;
+   - Burp's native username/password application login using `admin/ofbiz`;
+   - all paths on `localhost:8443` in scope except Ecommerce, logout endpoints,
+     and known state-changing locale/theme/time-zone navigation loops.
+5. Burp owns crawl depth, duration, audit strategy, and task completion. The
+   agent does not use a scan timeout, inactivity cutoff, or synthetic
+   completion heuristic.
+6. The launcher polls Burp's genuine REST task status and persists the complete
+   response in `scan-status.json`.
+7. The Montoya HTTP handler observes Burp's credential login. If that
+   established WebTools session is later rejected, it injects the verified
+   standby `JSESSIONID`; if the standby session has expired, it logs in again
+   and replaces it.
+8. Only after REST reports `succeeded`, Montoya asks Burp itself to generate
+   original HTML and XML reports.
+
+No Python coordinator, browser-driving framework, custom report renderer, Burp
+Docker image, MCP server, or LLM is involved.
+
+## Safety and scope
+
+- Target is fixed to
+  `https://localhost:8443/webtools/control/main`.
+- Ecommerce and real logout endpoints are excluded.
+- Shared resources and other OFBiz applications discovered from WebTools are
+  otherwise allowed on the same host and port.
+- Active auditing can mutate the disposable OFBiz demo database.
+- The launcher never deletes or resets the native Burp installation, licence,
+  user profile, or Docker image cache.
+- A pipeline run will not attach to or close an unrelated Burp process.
 
 ## Requirements
 
-- Linux with an X11 session.
-- Docker Engine with Docker Compose v2.
-- Maven and JDK 21.
-- A legitimate Burp Suite Professional licence and JAR.
-- An OFBiz source tree with a working Dockerfile.
+- Linux desktop session
+- Activated Burp Suite Professional with Desktop REST API enabled
+- Docker Engine with Docker Compose v2
+- JDK 17+ and Maven
+- Apache OFBiz source with its standard Dockerfile
 
-Burp Professional is a desktop product. This project containerises the official
-JAR supplied by the user; it does not redistribute Burp or a licence.
+## Configure
 
-## First-time setup
+Create the local configuration:
 
 ```bash
 cp .env.example .env
 chmod 600 .env
 ```
 
-Replace every placeholder in `.env`, then place your Burp Professional JAR at:
-
-```text
-burp/burpsuite_pro.jar
-```
-
-The first Burp launch may require licence activation in the forwarded UI. That is
-a PortSwigger licensing step. Once the persistent `burp-home` volume is activated,
-subsequent scans do not require the extension to be added manually.
-
-## Run
+In Burp, enable the Desktop REST API and generate an API key. Put its loopback
+URL and key in `BURP_REST_API_URL` and `BURP_REST_API_KEY`. Generate the
+independent local Montoya bridge token with:
 
 ```bash
-./start_pipeline.sh
+openssl rand -hex 32
 ```
 
-The runner intentionally creates a fresh Burp project for every scan so requests
-from a previous OFBiz release cannot leak into the next report. Licence state is
-retained separately in the persistent Burp home volume. It also deletes and
-recreates the isolated `burp-vapt-ofbiz-runtime` Docker volume so application
-state from a previous release is not reused.
+Put that value in `BURP_BRIDGE_TOKEN`. Secrets in `.env` are ignored by Git and
+are never printed by the launcher.
 
-Generated files are written under `artifacts/`, including:
-
-```text
-scan-status.json
-run-summary.json
-burp-vapt-report-<scan-id>.html
-```
-
-Stop the environment with:
+Build:
 
 ```bash
-./stop.sh
+./build.sh
 ```
 
-## Safety and scope
+Validate configuration without starting Docker or Burp:
 
-- Every seed URL must use HTTP(S) and its host must exactly match `TARGET_HOST`.
-- Only one scan can run at a time.
-- The bridge is published on host loopback and requires a 32+ character token.
-- Login and logout requests are excluded from active auditing.
-- Crawl and audit phases have explicit maximum durations.
-- Run active scanning only against isolated, authorised test environments.
+```bash
+java -jar burp-extension/target/burp-agent-bridge.jar --check
+```
 
-## Important Burp API limitation
+Start the complete pipeline:
 
-Montoya 2026.7 exposes the native `startCrawl()` operation, but the current
-`Crawl.statusMessage()` documentation says its status functionality is not yet
-implemented. The extension therefore uses two bounded completion signals:
+```bash
+java -jar burp-extension/target/burp-agent-bridge.jar
+```
 
-1. a terminal status when Burp supplies one; or
-2. `CRAWL_IDLE_SECONDS` without an increase in crawler request count, after
-   which the crawl task is stopped before the audit begins.
+Stop the project-managed Burp/OFBiz runtime and delete generated artifacts:
 
-This is deterministic and cannot hang forever, but an idle window is still a
-heuristic. Increase `CRAWL_IDLE_SECONDS` for slow applications.
+```bash
+java -jar burp-extension/target/burp-agent-bridge.jar --stop-clean
+```
 
-The public Montoya audit API currently exposes
-`LEGACY_ACTIVE_AUDIT_CHECKS`; it does not expose the desktop scan launcher's
-named **Balanced** preset. The project therefore performs a real Burp active
-audit, but must not claim that it programmatically selects the Balanced preset.
+Cleanup preserves source code, the JAR, native Burp installation and profile,
+licence data, and Docker image cache.
 
-For a vendor-supported CI/scheduling API with first-class scan state, use Burp
-Suite DAST. This project is appropriate when the company specifically chooses
-to automate an existing Burp Professional licence.
+## Outputs
+
+Each run writes:
+
+```text
+artifacts/run-YYYYMMDD-HHMMSS/
+├── bridge.log
+├── burp-native.log
+├── burp-project.burp
+├── burp-report-<task-id>.html
+├── burp-report-<task-id>.xml
+└── scan-status.json
+```
+
+`scan-status.json` is Burp's current REST task state and metrics. The report
+files are generated by Montoya's `scanner().generateReport(...)`, not by an
+agent-created template.
+
+## Session behavior
+
+Burp initially discovers the login form and may deliberately submit invalid
+values while identifying login behavior. It then submits the configured
+application credentials. The Montoya handler recognizes only an exact
+configured credential submission as the crawler's authenticated session.
+
+OFBiz issues `JSESSIONID` dynamically; no static ID is configured. A background
+agent-created session is verified against
+`/webtools/control/entitymaint`. It is used only as recovery after Burp's
+credential session has been established and subsequently rejected. Recovery
+refresh is single-flight, so concurrent scanner requests cannot trigger a
+login storm.
+
+## Why both REST and Montoya are required
+
+Burp Desktop REST provides the native authenticated scan request and reliable
+task lifecycle (`crawling`, `auditing`, `succeeded`, `failed`) with real
+metrics. Montoya provides in-process HTTP interception/session recovery and
+Burp-native HTML/XML report generation. The Desktop REST API does not expose a
+report-generation endpoint, while Montoya's public crawl task API does not
+expose the full authenticated scan configuration or a reliable crawl
+completion status. The hybrid uses each supported API only for what it
+actually provides.

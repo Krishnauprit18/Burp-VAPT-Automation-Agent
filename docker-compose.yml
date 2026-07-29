@@ -2,61 +2,14 @@ services:
   ofbiz:
     build:
       context: ${OFBIZ_SOURCE}
-    container_name: ofbiz-agent-ofbiz
-    networks: [agentnet]
+      target: demo
+    container_name: ofbiz-burp-agent-target
     ports:
-      - "8443:8443"
+      - "127.0.0.1:8443:8443"
     volumes:
       - ofbiz-runtime:/ofbiz/runtime
     restart: unless-stopped
 
-  burp:
-    build: ./burp
-    container_name: ofbiz-agent-burp
-    networks: [agentnet]
-    environment:
-      DISPLAY: ${DISPLAY:-:0}
-      BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
-      BURP_BRIDGE_PORT: ${BURP_BRIDGE_PORT:-1338}
-      OFBIZ_USERNAME: ${OFBIZ_USERNAME}
-      OFBIZ_PASSWORD: ${OFBIZ_PASSWORD}
-      TARGET_HOST: ${TARGET_HOST:-ofbiz}
-      CRAWL_IDLE_SECONDS: ${CRAWL_IDLE_SECONDS:-180}
-      MAX_CRAWL_SECONDS: ${MAX_CRAWL_SECONDS:-7200}
-      MAX_AUDIT_SECONDS: ${MAX_AUDIT_SECONDS:-14400}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - burp-home:/home/burp
-      - ./burp-extension/target/burp-agent-bridge.jar:/opt/burp/extensions/burp-agent-bridge.jar:ro
-      - ./artifacts:/artifacts
-    ports:
-      - "127.0.0.1:${BURP_PROXY_PORT:-8080}:8080"
-      - "127.0.0.1:${BURP_BRIDGE_PORT:-1338}:${BURP_BRIDGE_PORT:-1338}"
-    depends_on: [ofbiz]
-    restart: unless-stopped
-
-  capture-agent:
-    build: ./agent
-    container_name: ofbiz-agent-capture
-    networks: [agentnet]
-    environment:
-      SCAN_SEED_URLS: ${SCAN_SEED_URLS:-https://ofbiz:8443/webtools/control/main}
-      BURP_BRIDGE_URL: http://burp:${BURP_BRIDGE_PORT:-1338}
-      BURP_BRIDGE_TOKEN: ${BURP_BRIDGE_TOKEN}
-      TARGET_HOST: ${TARGET_HOST:-ofbiz}
-      MAX_SCAN_SECONDS: ${MAX_SCAN_SECONDS:-18000}
-      SCAN_POLL_SECONDS: ${SCAN_POLL_SECONDS:-15}
-    volumes:
-      - ./artifacts:/artifacts
-    depends_on: [burp]
-    profiles: [run]
-
-networks:
-  agentnet:
-    name: ofbiz-agent-network
-
 volumes:
   ofbiz-runtime:
-    name: burp-vapt-ofbiz-runtime
-  burp-home:
-    name: burp-vapt-burp-home
+    name: ofbiz-burp-agent-runtime

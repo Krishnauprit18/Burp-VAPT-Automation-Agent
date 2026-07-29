@@ -1,91 +1,165 @@
 package com.krishna.burpagent.service;
 
 import burp.api.montoya.MontoyaApi;
+import com.krishna.burpagent.model.TargetScope;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 public class ConfigurationService {
     private final MontoyaApi api;
-    private final String logFile = "/home/krishna/Pictures/ofbiz-burp-agent/bridge_init.log";
+    private final TargetScope target;
+    private final Path artifactsDirectory;
+    private final Path logFile;
 
     public ConfigurationService(MontoyaApi api) {
         this.api = api;
+        this.target = TargetScope.webTools(environment("TARGET_URL", TargetScope.DEFAULT_URL));
+        this.artifactsDirectory = Path.of(environment("ARTIFACTS_DIR", "artifacts"))
+                .toAbsolutePath().normalize();
+        this.logFile = artifactsDirectory.resolve("bridge.log");
     }
 
     public void logDiagnostics(String msg) {
         try {
-            Path p = Path.of(logFile);
-            Files.writeString(p, "[" + java.time.Instant.now() + "] " + msg + "\n",
+            Files.createDirectories(artifactsDirectory);
+            Files.writeString(logFile, "[" + java.time.Instant.now() + "] " + msg + "\n",
                 StandardCharsets.UTF_8,
                 java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
         } catch (Exception ignored) {}
     }
 
     public String getSecurityToken() {
-        String token = System.getenv().getOrDefault("BURP_BRIDGE_TOKEN", "");
-        if (token.length() < 32) token = loadTokenFromFile("/home/krishna/Pictures/ofbiz-burp-agent/.env");
-        if (token.length() < 32) token = loadTokenFromFile(".env");
-        return token;
+        return environment("BURP_BRIDGE_TOKEN", "");
     }
 
-    private String loadTokenFromFile(String filepath) {
+    public String targetHost() {
+        return target.host();
+    }
+
+    public int targetPort() {
+        return target.port();
+    }
+
+    public String targetUrl() {
+        return target.url();
+    }
+
+    public String ofbizUsername() {
+        return environment("OFBIZ_USERNAME", "admin");
+    }
+
+    public String ofbizPassword() {
+        return environment("OFBIZ_PASSWORD", "ofbiz");
+    }
+
+    public boolean isAllowedPath(String path) {
+        return target.allowsPath(path);
+    }
+
+    public boolean isLogoutPath(String path) {
+        return target.isLogoutPath(path);
+    }
+
+    public boolean isLoginPath(String path) {
+        return target.isLoginPath(path);
+    }
+
+    public boolean isCrawlerNavigationTrap(String path) {
+        return target.isCrawlerNavigationTrap(path);
+    }
+
+    public boolean usesPrimaryApplicationSession(String path) {
+        return target.usesPrimaryApplicationSession(path);
+    }
+
+    public Path artifactsDirectory() {
+        return artifactsDirectory;
+    }
+
+    public String environment(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null || value.isBlank() ? defaultValue : value.trim();
+    }
+
+    public long environmentLong(String name, long defaultValue) {
+        String value = System.getenv(name);
+        if (value == null || value.isBlank()) return defaultValue;
         try {
-            Path path = Path.of(filepath);
-            if (Files.exists(path)) {
-                for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
-                    line = line.trim();
-                    if (line.startsWith("BURP_BRIDGE_TOKEN=")) {
-                        String val = line.substring("BURP_BRIDGE_TOKEN=".length()).trim();
-                        if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
-                            val = val.substring(1, val.length() - 1);
-                        }
-                        return val;
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
-        return "";
+            return Long.parseLong(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(name + " must be an integer", e);
+        }
     }
 
-    public void injectAggressiveScanRules() {
-        String user = System.getenv().getOrDefault("OFBIZ_USERNAME", "admin");
-        String pass = System.getenv().getOrDefault("OFBIZ_PASSWORD", "ofbiz");
+    public void applyProjectScope() {
+        String optionsJson = buildProjectOptionsJson(targetHost(), targetPort());
 
-        String optionsJson = String.format("""
+        try {
+            api.burpSuite().importProjectOptionsFromJson(optionsJson);
+            String msg = "Burp project configuration loaded with WebTools seed, "
+                    + "Ecommerce exclusion, and logout protection for " + targetUrl();
+            logDiagnostics(msg);
+            api.logging().logToOutput(msg);
+        } catch (Exception e) {
+            logDiagnostics("Error importing project options: " + e.getMessage());
+            throw new IllegalStateException("Burp rejected the project scope configuration", e);
+        }
+    }
+
+    static String buildProjectOptionsJson(
+            String host,
+            int port) {
+        String hostPattern = "^" + Pattern.quote(host) + "$";
+        return String.format("""
         {
           "target": {
             "scope": {
               "advanced_mode": true,
               "include": [
-                { "enabled": true, "host": "^ofbiz$", "port": "^8443$", "protocol": "https" },
-                { "enabled": true, "host": "^localhost$", "port": "^8443$", "protocol": "https" },
-                { "enabled": true, "host": "^127\\\\.0\\\\.0\\\\.1$", "port": "^8443$", "protocol": "https" }
+                {
+                  "enabled": true,
+                  "host": "%s",
+                  "port": "^%d$",
+                  "protocol": "https",
+                  "file": "^/.*"
+                }
               ],
               "exclude": [
-                { "enabled": true, "host": "^.*$", "file": ".*(logout|Logout|checkLogin).*" }
+                {
+                  "enabled": true,
+                  "host": "%s",
+                  "port": "^%d$",
+                  "protocol": "https",
+                  "file": "(?i)^/ecommerce(?:/.*)?$"
+                },
+                {
+                  "enabled": true,
+                  "host": "%s",
+                  "port": "^%d$",
+                  "protocol": "https",
+                  "file": "(?i)^/[^/]+/control/logout(?:/.*)?$"
+                },
+                {
+                  "enabled": true,
+                  "host": "%s",
+                  "port": "^%d$",
+                  "protocol": "https",
+                  "file": "(?i)^/(?:webtools/control/(?:ListLocales|setSessionLocale|setUserLocale|ListVisualThemes|selectTheme|setUserPreference)|common-js/control/SetTimeZoneFromBrowser)$"
+                }
               ]
-            }
-          },
-          "scanner": {
-            "application_logins": [
-              { "enabled": true, "type": "UsernameAndPasswordCredentials", "username": "%s", "password": "%s" }
-            ],
-            "crawl_options": {
-              "read_timeout_millis": 10000,
-              "max_concurrent_requests": 15
             }
           }
         }
-        """, user, pass);
+        """, jsonEscape(hostPattern), port,
+                jsonEscape(hostPattern), port,
+                jsonEscape(hostPattern), port,
+                jsonEscape(hostPattern), port);
+    }
 
-        try {
-            api.burpSuite().importProjectOptionsFromJson(optionsJson);
-            String msg = "Aggressive Scan Configuration & OFBiz Credentials (" + user + ") loaded into Burp Project!";
-            logDiagnostics(msg);
-            api.logging().logToOutput(msg);
-        } catch (Exception e) {
-            logDiagnostics("Error importing project options: " + e.getMessage());
-        }
+    private static String jsonEscape(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

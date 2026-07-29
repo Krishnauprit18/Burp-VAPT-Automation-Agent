@@ -22,13 +22,8 @@ jobs:
       - name: Compile Montoya extension
         run: mvn --batch-mode --file burp-extension/pom.xml clean package
 
-      - name: Validate Python
-        run: python3 -m py_compile agent/run.py
-
       - name: Validate shell
-        run: bash -n build.sh master.sh start_pipeline.sh stop.sh burp/start-burp.sh
+        run: bash -n build.sh
 
-      - name: Validate JSON
-        run: |
-          python3 -m json.tool burp/project-options.json >/dev/null
-          python3 -m json.tool burp/user-options.json >/dev/null
+      - name: Validate Compose model
+        run: docker compose --env-file .env.example config --quiet
