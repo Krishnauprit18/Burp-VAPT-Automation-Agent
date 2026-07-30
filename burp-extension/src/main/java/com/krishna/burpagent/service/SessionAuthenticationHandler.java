@@ -1,6 +1,5 @@
 package com.krishna.burpagent.service;
 
-import burp.api.montoya.core.ToolType;
 import burp.api.montoya.http.handler.*;
 import burp.api.montoya.http.message.HttpHeader;
 import burp.api.montoya.http.message.requests.HttpRequest;
@@ -43,13 +42,6 @@ public class SessionAuthenticationHandler implements HttpHandler {
             if (configService.isLogoutPath(path)) {
                 configService.logDiagnostics(
                         "[Session agent] Blocked crawler request to a logout endpoint: " + path);
-                return RequestToBeSentAction.drop();
-            }
-
-            if (requestToBeSent.toolSource().isFromTool(ToolType.SCANNER)
-                    && configService.isCrawlerNavigationTrap(path)) {
-                configService.logDiagnostics(
-                        "[Crawl guard] Blocked state-changing OFBiz utility navigation: " + path);
                 return RequestToBeSentAction.drop();
             }
 
@@ -216,4 +208,5 @@ public class SessionAuthenticationHandler implements HttpHandler {
         }
         return "";
     }
+
 }
