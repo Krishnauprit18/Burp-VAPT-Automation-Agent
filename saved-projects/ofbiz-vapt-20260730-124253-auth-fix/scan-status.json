@@ -1,0 +1,1334 @@
+{
+  "scan_metrics" : {
+    "current_url" : "",
+    "crawl_requests_made" : 520,
+    "crawl_network_errors" : 2,
+    "crawl_unique_locations_visited" : 20,
+    "crawl_requests_queued" : 0,
+    "audit_queue_items_completed" : 0,
+    "audit_queue_items_waiting" : 78,
+    "audit_requests_made" : 7850,
+    "audit_network_errors" : 52,
+    "issue_events" : 20,
+    "crawl_and_audit_caption" : "Scanning",
+    "crawl_and_audit_progress" : 2,
+    "total_elapsed_time" : 405,
+    "login_count" : 0,
+    "login_skipped_count" : 0
+  },
+  "issue_events" : [ {
+    "id" : "0",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "TLS certificate",
+      "type_index" : 16777472,
+      "serial_number" : "3686725358980792320",
+      "origin" : "https://localhost:8443",
+      "path" : "/",
+      "severity" : "medium",
+      "confidence" : "certain",
+      "description" : "The following problems were identified with the server's TLS certificate:<ul><li>The server's certificate is not valid for the server's hostname.</li><li>The server's certificate is not trusted.</li><li>The server's certificate has expired.</li></ul><b>Note:</b> Burp relies on the Java trust store to determine whether certificates are trusted. The Java trust store does not include every root CA certificate that is included within browser trust stores. Burp might incorrectly report that a certificate is not trusted, if a valid root CA certificate is being used that is not included in the Java trust store.<br><br>The server presented the following certificate:<br><br><table><tr><td><b>Issued to:</b>&nbsp;&nbsp;</td><td>ofbiz-vm.apache.org</td></tr><tr><td><b>Issued by:</b>&nbsp;&nbsp;</td><td>ofbiz-vm.apache.org</td></tr><tr><td><b>Valid from:</b>&nbsp;&nbsp;</td><td>Fri May 30 14:13:19 IST 2014</td></tr><tr><td><b>Valid to:</b>&nbsp;&nbsp;</td><td>Mon May 27 14:13:19 IST 2024</td></tr></table>",
+      "issue_background" : "<p>TLS (or SSL) helps to protect the confidentiality and integrity of information in transit between the browser and server, and to provide authentication of the server's identity. To serve this purpose, the server must present an TLS certificate that is valid for the server's hostname, is issued by a trusted authority and is valid for the current date. If any one of these requirements is not met, TLS connections to the server will not provide the full protection for which TLS is designed.</p>\n<p>It should be noted that various attacks exist against TLS in general, and in the context of HTTPS web connections in particular. It may be possible for a determined and suitably-positioned attacker to compromise TLS connections without user detection even when a valid TLS certificate is used. </p>",
+      "caption" : "/",
+      "evidence" : [ ],
+      "internal_data" : "eyJmbGFncyI6MTQsInZhcmlhbnQiOjAsImlzc3VlX2RldGFpbHNfbWFwIjp7IjM0Ijoip29mYml6LXZtLmFwYWNoZS5vcmenb2ZiaXotdm0uYXBhY2hlLm9yZ6dGcmkgTWF5IDMwIDE0OjEzOjE5IElTVCAyMDE0p01vbiBNYXkgMjcgMTQ6MTM6MTkgSVNUIDIwMjSnMTSnIn19",
+      "fingerprint" : ":type=TLS_CERTIFICATE:origin=https%3A%2F%2Flocalhost%3A8443:path=%2F"
+    }
+  }, {
+    "id" : "1",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "4888448647505596416",
+      "origin" : "https://localhost:8443",
+      "path" : "/webtools/control/main",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path filename is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/webtools/control/main [URL path filename]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "YjA0Ymt2NDNjeg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/webtools/control/mainb04bkv43cz",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC93ZWJ0b29scy9jb250cm9sL21haW4=",
+            "length" : 26
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YjA0Ymt2NDNjeg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "IEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiB0ZXh0L2h0bWwsYXBwbGljYXRpb24veGh0bWwreG1sLGFwcGxpY2F0aW9uL3htbDtxPTAuOSxpbWFnZS9hdmlmLGltYWdlL3dlYnAsaW1hZ2UvYXBuZywqLyo7cT0wLjgsYXBwbGljYXRpb24vc2lnbmVkLWV4Y2hhbmdlO3Y9YjM7cT0wLjcNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KVXBncmFkZS1JbnNlY3VyZS1SZXF1ZXN0czogMQ0KDQo=",
+            "length" : 665
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDIwMCBPSw0KU2V0LUNvb2tpZTogSlNFU1NJT05JRD02Q0NDNjk5QzQ0MkI5NDY2RUY1NDM5NUQ0NDAzNDMzQS5qdm0xOyBQYXRoPS93ZWJ0b29sczsgU2VjdXJlOyBIdHRwT25seQ0KU2V0LUNvb2tpZTogT0ZCaXouVmlzaXRvcj0yODE3NzsgTWF4LUFnZT0zMTUzNjAwMDsgRXhwaXJlcz1GcmksIDMwIEp1bCAyMDI3IDA3OjE1OjIwIEdNVDsgUGF0aD0vOyBTZWN1cmU7IEh0dHBPbmx5DQpWYXJ5OiBhY2NlcHQtZW5jb2RpbmcNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9VVRGLTgNCkRhdGU6IFRodSwgMzAgSnVsIDIwMjYgMDc6MTU6MjAgR01UDQoNCjwhRE9DVFlQRSBIVE1MIFBVQkxJQyAiLS8vSUVURi8vRFREIEhUTUwgMi4wLy9FTiI+CjxodG1sPgo8aGVhZD4KICAgIDxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtU2VjdXJpdHktUG9saWN5IiBmcmFtZS1hbmNlc3RvcnM9InNlbGYiPgogICAgPHRpdGxlPjUwMCBJbnRlcm5hbCBlcnJvcjwvdGl0bGU+CiAgICA8c3R5bGU+CiAgICAgICAgYm9keXsK",
+            "length" : 528
+          }, {
+            "type" : "SnipSegment",
+            "length" : 2601
+          }, {
+            "type" : "DataSegment",
+            "data" : "PHA+b3JnLmFwYWNoZS5vZmJpei53ZWJhcHAuY29udHJvbC5SZXF1ZXN0SGFuZGxlckV4Y2VwdGlvbjogVW5rbm93biByZXF1ZXN0ICYjeDViO21haW4=",
+            "length" : 86
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YjA0Ymt2NDNjeg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiN4NWQ7JiN4M2I7IHRoaXMgcmVxdWVzdCBkb2VzIG5vdCBleGlzdCBvciBjYW5ub3QgYmUgY2FsbGVkIGRpcmVjdGx5LjwvcD4=",
+            "length" : 74
+          }, {
+            "type" : "SnipSegment",
+            "length" : 31672
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395720762"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6IjEyeDAiLCJpbnNlcnRpb25fcG9pbnRfaWRlbnRpZmllcnMiOlt7InR5cGVfaW5kZXgiOjQxMDUsIm5hbWUiOiIzIn1dLCJpc3N1ZV9kZXRhaWxzX21hcCI6e319",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fwebtools%2Fcontrol%2Fmain:ip=PATH_FILENAME_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "2",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "2014873481835444224",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/setUserTimeZone.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/setUserTimeZone.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "M24ycmliM2czMA==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js3n2rib3g30/util/setUserTimeZone.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "M24ycmliM2czMA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3V0aWwvc2V0VXNlclRpbWVab25lLmpzIEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiAqLyoNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 582
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzc3DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE2OjU1IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "M24ycmliM2czMA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nzt1dGlsJiM0NztzZXRVc2VyVGltZVpvbmUuanNdIGlzIG5vdCBhdmFpbGFibGU8L3A+",
+            "length" : 54
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395815461"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FsetUserTimeZone.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "3",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "5401933971753603072",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/selectMultipleRelatedValues.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/selectMultipleRelatedValues.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "Njg5aDAzbHFmdQ==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js689h03lqfu/util/selectMultipleRelatedValues.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Njg5aDAzbHFmdQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3V0aWwvc2VsZWN0TXVsdGlwbGVSZWxhdGVkVmFsdWVzLmpzIEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiAqLyoNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KQ29va2llOiBPRkJpei5WaXNpdG9yPTI4OTE0DQpSZWZlcmVyOiBodHRwczovL2xvY2FsaG9zdDo4NDQzL3dlYnRvb2xzL2NvbnRyb2wvbWFpbg0KDQo=",
+            "length" : 623
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzg5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE2OjU2IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Njg5aDAzbHFmdQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nzt1dGlsJiM0NztzZWxlY3RNdWx0aXBsZVJlbGF0ZWRWYWx1ZXMuanNdIGlzIG5vdCBhdmFpbGFibGU8L3A+",
+            "length" : 66
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395816410"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FselectMultipleRelatedValues.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "4",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "7410408342529817600",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/fieldlookup.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/fieldlookup.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "bzA1Y2V1Y3hxMg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jso05ceucxq2/util/fieldlookup.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bzA1Y2V1Y3hxMg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3V0aWwvZmllbGRsb29rdXAuanMgSFRUUC8yDQpIb3N0OiBsb2NhbGhvc3Q6ODQ0Mw0KQ2FjaGUtQ29udHJvbDogbWF4LWFnZT0wDQpTZWMtQ0gtVUE6ICJHb29nbGUgQ2hyb21lIjt2PSIxNTAiLCAiTm90PUE/QnJhbmQiO3Y9IjgiLCAiQ2hyb21pdW0iO3Y9IjE1MCINClNlYy1DSC1VQS1Nb2JpbGU6ID8wDQpTZWMtQ0gtVUEtUGxhdGZvcm06ICJMaW51eCINCkFjY2VwdC1MYW5ndWFnZTogZW4tVVM7cT0wLjksZW47cT0wLjgNClVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE1MC4wLjAuMCBTYWZhcmkvNTM3LjM2DQpBY2NlcHQ6ICovKg0KU2VjLUZldGNoLVNpdGU6IG5vbmUNClNlYy1GZXRjaC1Nb2RlOiBuYXZpZ2F0ZQ0KU2VjLUZldGNoLVVzZXI6ID8xDQpTZWMtRmV0Y2gtRGVzdDogZG9jdW1lbnQNCkFjY2VwdC1FbmNvZGluZzogZ3ppcCwgZGVmbGF0ZSwgYnINCkNvbm5lY3Rpb246IGNsb3NlDQpDb29raWU6IE9GQml6LlZpc2l0b3I9Mjg5MTkNClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9tYWluDQoNCg==",
+            "length" : 607
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzczDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE2OjU2IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bzA1Y2V1Y3hxMg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nzt1dGlsJiM0NztmaWVsZGxvb2t1cC5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 50
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395816913"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2Ffieldlookup.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "5",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "6751634116096645120",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/node_modules/moment/min/moment-with-locales.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/node_modules/moment/min/moment-with-locales.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "YXRmdGUyMDl5ag==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jsatfte209yj/node_modules/moment/min/moment-with-locales.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YXRmdGUyMDl5ag==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L25vZGVfbW9kdWxlcy9tb21lbnQvbWluL21vbWVudC13aXRoLWxvY2FsZXMuanMgSFRUUC8yDQpIb3N0OiBsb2NhbGhvc3Q6ODQ0Mw0KQ2FjaGUtQ29udHJvbDogbWF4LWFnZT0wDQpTZWMtQ0gtVUE6ICJHb29nbGUgQ2hyb21lIjt2PSIxNTAiLCAiTm90PUE/QnJhbmQiO3Y9IjgiLCAiQ2hyb21pdW0iO3Y9IjE1MCINClNlYy1DSC1VQS1Nb2JpbGU6ID8wDQpTZWMtQ0gtVUEtUGxhdGZvcm06ICJMaW51eCINCkFjY2VwdC1MYW5ndWFnZTogZW4tVVM7cT0wLjksZW47cT0wLjgNClVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE1MC4wLjAuMCBTYWZhcmkvNTM3LjM2DQpBY2NlcHQ6ICovKg0KU2VjLUZldGNoLVNpdGU6IG5vbmUNClNlYy1GZXRjaC1Nb2RlOiBuYXZpZ2F0ZQ0KU2VjLUZldGNoLVVzZXI6ID8xDQpTZWMtRmV0Y2gtRGVzdDogZG9jdW1lbnQNCkFjY2VwdC1FbmNvZGluZzogZ3ppcCwgZGVmbGF0ZSwgYnINCkNvbm5lY3Rpb246IGNsb3NlDQpDb29raWU6IE9GQml6LlZpc2l0b3I9Mjg5MzMNClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9tYWluDQoNCg==",
+            "length" : 634
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogODA4DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE2OjU3IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YXRmdGUyMDl5ag==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nztub2RlX21vZHVsZXMmIzQ3O21vbWVudCYjNDc7bWluJiM0Nzttb21lbnQtd2l0aC1sb2NhbGVzLmpzXSBpcyBub3QgYXZhaWxhYmxlPC9wPg==",
+            "length" : 85
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395818218"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fnode_modules%2Fmoment%2Fmin%2Fmoment-with-locales.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "6",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "2968923415072753664",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/plugins/date/date.timezone-min.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/plugins/date/date.timezone-min.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "Z3poOTJwZGQycw==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jsgzh92pdd2s/plugins/date/date.timezone-min.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Z3poOTJwZGQycw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3BsdWdpbnMvZGF0ZS9kYXRlLnRpbWV6b25lLW1pbi5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yODk1NA0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 621
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzkxDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE3OjAwIEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Z3poOTJwZGQycw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztwbHVnaW5zJiM0NztkYXRlJiM0NztkYXRlLnRpbWV6b25lLW1pbi5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 68
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395820853"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fplugins%2Fdate%2Fdate.timezone-min.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "7",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "5421078213627737088",
+      "origin" : "https://localhost:8443",
+      "path" : "/helveticus/javascript.css",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path filename is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/helveticus/javascript.css [URL path filename]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "d2pucXBxOG01Yw==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/helveticus/javascript.csswjnqpq8m5c",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9oZWx2ZXRpY3VzL2phdmFzY3JpcHQuY3Nz",
+            "length" : 30
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "d2pucXBxOG01Yw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "IEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiB0ZXh0L2NzcywqLyo7cT0wLjENClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KQ29va2llOiBPRkJpei5WaXNpdG9yPTI4OTkzDQpSZWZlcmVyOiBodHRwczovL2xvY2FsaG9zdDo4NDQzL3dlYnRvb2xzL2NvbnRyb2wvbWFpbg0KDQo=",
+            "length" : 602
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzYxDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE3OjA2IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2hlbHZldGljdXMmIzQ3O2phdmFzY3JpcHQuY3Nz",
+            "length" : 63
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "d2pucXBxOG01Yw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "XSBpcyBub3QgYXZhaWxhYmxlPC9wPg==",
+            "length" : 22
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395826816"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6IjEyeDAiLCJpbnNlcnRpb25fcG9pbnRfaWRlbnRpZmllcnMiOlt7InR5cGVfaW5kZXgiOjQxMDUsIm5hbWUiOiIyIn1dLCJpc3N1ZV9kZXRhaWxzX21hcCI6e319",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fhelveticus%2Fjavascript.css:ip=PATH_FILENAME_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "8",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "882750566387737600",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/miscAjaxFunctions.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/miscAjaxFunctions.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "ZXNmdzE3MzFhbA==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jsesfw1731al/util/miscAjaxFunctions.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "ZXNmdzE3MzFhbA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3V0aWwvbWlzY0FqYXhGdW5jdGlvbnMuanMgSFRUUC8yDQpIb3N0OiBsb2NhbGhvc3Q6ODQ0Mw0KQ2FjaGUtQ29udHJvbDogbWF4LWFnZT0wDQpTZWMtQ0gtVUE6ICJHb29nbGUgQ2hyb21lIjt2PSIxNTAiLCAiTm90PUE/QnJhbmQiO3Y9IjgiLCAiQ2hyb21pdW0iO3Y9IjE1MCINClNlYy1DSC1VQS1Nb2JpbGU6ID8wDQpTZWMtQ0gtVUEtUGxhdGZvcm06ICJMaW51eCINCkFjY2VwdC1MYW5ndWFnZTogZW4tVVM7cT0wLjksZW47cT0wLjgNClVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE1MC4wLjAuMCBTYWZhcmkvNTM3LjM2DQpBY2NlcHQ6ICovKg0KU2VjLUZldGNoLVNpdGU6IG5vbmUNClNlYy1GZXRjaC1Nb2RlOiBuYXZpZ2F0ZQ0KU2VjLUZldGNoLVVzZXI6ID8xDQpTZWMtRmV0Y2gtRGVzdDogZG9jdW1lbnQNCkFjY2VwdC1FbmNvZGluZzogZ3ppcCwgZGVmbGF0ZSwgYnINCkNvbm5lY3Rpb246IGNsb3NlDQpDb29raWU6IE9GQml6LlZpc2l0b3I9MjkwMDYNClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9tYWluDQoNCg==",
+            "length" : 613
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzc5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE3OjA4IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "ZXNmdzE3MzFhbA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nzt1dGlsJiM0NzttaXNjQWpheEZ1bmN0aW9ucy5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 56
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395828489"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FmiscAjaxFunctions.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "9",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "4358898255204109312",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/plugins/date/FromThruDateCheck.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/plugins/date/FromThruDateCheck.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "cDBldm12NmYydQ==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jsp0evmv6f2u/plugins/date/FromThruDateCheck.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cDBldm12NmYydQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3BsdWdpbnMvZGF0ZS9Gcm9tVGhydURhdGVDaGVjay5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yOTAwNw0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 621
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzkxDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE3OjA4IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cDBldm12NmYydQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztwbHVnaW5zJiM0NztkYXRlJiM0NztGcm9tVGhydURhdGVDaGVjay5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 68
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395828697"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fplugins%2Fdate%2FFromThruDateCheck.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "10",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "6484552204984175616",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/node_modules/jquery-validation/dist/localization/messages_en.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 2 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/node_modules/jquery-validation/dist/localization/messages_en.js [URL path folder 2]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "bjBnbTdoMjZiZg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/jsn0gm7h26bf/node_modules/jquery-validation/dist/localization/messages_en.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanM=",
+            "length" : 14
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bjBnbTdoMjZiZg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L25vZGVfbW9kdWxlcy9qcXVlcnktdmFsaWRhdGlvbi9kaXN0L2xvY2FsaXphdGlvbi9tZXNzYWdlc19lbi5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yOTA1MQ0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 651
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogODI5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE3OjE0IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anM=",
+            "length" : 47
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bjBnbTdoMjZiZg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nztub2RlX21vZHVsZXMmIzQ3O2pxdWVyeS12YWxpZGF0aW9uJiM0NztkaXN0JiM0Nztsb2NhbGl6YXRpb24mIzQ3O21lc3NhZ2VzX2VuLmpzXSBpcyBub3QgYXZhaWxhYmxlPC9wPg==",
+            "length" : 106
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395835033"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MSIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjIifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fnode_modules%2Fjquery-validation%2Fdist%2Flocalization%2Fmessages_en.js:ip=PATH_FOLDER_PARAM%2F2:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "11",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "7125834702811143168",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/setUserTimeZone.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/setUserTimeZone.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "cnE3ZjhiYjdtNw==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/utilrq7f8bb7m7/setUserTimeZone.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvdXRpbA==",
+            "length" : 19
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cnE3ZjhiYjdtNw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3NldFVzZXJUaW1lWm9uZS5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yOTYwMg0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 606
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzc3DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjAwIEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3V0aWw=",
+            "length" : 56
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cnE3ZjhiYjdtNw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztzZXRVc2VyVGltZVpvbmUuanNdIGlzIG5vdCBhdmFpbGFibGU8L3A+",
+            "length" : 45
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395940902"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FsetUserTimeZone.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "12",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "3121646842967311360",
+      "origin" : "https://localhost:8443",
+      "path" : "/webtools/control/login",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the <b>USERNAME</b> request parameter is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/webtools/control/login [USERNAME parameter]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "YjJhc2Z2bjk2aA==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/webtools/control/login",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "UE9TVCAvd2VidG9vbHMvY29udHJvbC9sb2dpbiBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogdGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksaW1hZ2UvYXZpZixpbWFnZS93ZWJwLGltYWdlL2FwbmcsKi8qO3E9MC44LGFwcGxpY2F0aW9uL3NpZ25lZC1leGNoYW5nZTt2PWIzO3E9MC43DQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogSlNFU1NJT05JRD1FMzMxQ0VFQzdBMEVBNjc1QTcwODFGMkU0QkI3RDNFRi5qdm0xOyBPRkJpei5WaXNpdG9yPTI5MTU0DQpPcmlnaW46IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMNClVwZ3JhZGUtSW5zZWN1cmUtUmVxdWVzdHM6IDENClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9jaGVja0xvZ2luDQpDb250ZW50LVR5cGU6IGFwcGxpY2F0aW9uL3gtd3d3LWZvcm0tdXJsZW5jb2RlZA0KQ29udGVudC1MZW5ndGg6IDYxDQoNClVTRVJOQU1FPWprbGdOTnNL",
+            "length" : 951
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YjJhc2Z2bjk2aA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JlBBU1NXT1JEPXYyUSUyMW84aCUyMVA2JkphdmFTY3JpcHRFbmFibGVkPVk=",
+            "length" : 44
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDIwMCBPSw0KU2V0LUNvb2tpZTogSlNFU1NJT05JRD0xNDNDODYxNzlBNTFBMjBDM0NEMTRBQjU2OTk0QTZFQi5qdm0xOyBQYXRoPS93ZWJ0b29sczsgU2VjdXJlOyBIdHRwT25seTsgU2FtZVNpdGU9c3RyaWN0DQpDYWNoZS1Db250cm9sOiBTZXQtQ29va2llDQpYLUZyYW1lLU9wdGlvbnM6IHNhbWVvcmlnaW4NClN0cmljdC1UcmFuc3BvcnQtU2VjdXJpdHk6IG1heC1hZ2U9MzE1MzYwMDA7IGluY2x1ZGVTdWJEb21haW5zDQpYLUNvbnRlbnQtVHlwZS1PcHRpb25zOiBub3NuaWZmDQpYLVhzcy1Qcm90ZWN0aW9uOiAxOyBtb2RlPWJsb2NrDQpSZWZlcnJlci1Qb2xpY3k6IG5vLXJlZmVycmVyLXdoZW4tZG93bmdyYWRlDQpDb250ZW50LVNlY3VyaXR5LVBvbGljeS1SZXBvcnQtT25seTogZGVmYXVsdC1zcmMgJ3NlbGYnDQpTZXQtQ29va2llOiBPRkJpei5WaXNpdG9yPTI5MTU0OyBNYXgtQWdlPTMxNTM2MDAwOyBFeHBpcmVzPUZyaSwgMzAgSnVsIDIwMjcgMDc6MTg6NTkgR01UOyBQYXRoPS87IFNlY3VyZTsgSHR0cE9ubHk7IFNhbWVTaXRlPXN0cmljdA0KVmFyeTogYWNjZXB0LWVuY29kaW5nDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbDtjaGFyc2V0PVVURi04DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE4OjU5IEdNVA0KDQo8IURPQ1RZUEUgaHRtbD4KPCEtLSBCZWdpbiBzZWN0aW9uIHdpZGdldGNvbXBvbmVudDovL2NvbW1vbi93aWRnZXQvQ29tbW9uU2NyZWVucy54bWwjbG9naW4gaWQgYmVkMjY0ZmMtNTNmNC00ODU4LTliY2YtMjYwN2EyMzRhZWI4IC0tPgo8IS0tIEJlZ2luIHNlY3Rpb24gd2lkZ2V0Y29tcG9uZW50Oi8vY29tbW9uL3dpZGdldC9Db21tb25TY3JlZW5zLg==",
+            "length" : 850
+          }, {
+            "type" : "SnipSegment",
+            "length" : 7423
+          }, {
+            "type" : "DataSegment",
+            "data" : "PGlucHV0IHR5cGU9InRleHQiIG5hbWU9IlVTRVJOQU1FIiB2YWx1ZT0iamtsZ05Oc0s=",
+            "length" : 50
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "YjJhc2Z2bjk2aA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "IiB0YWJpbmRleD0iMCIgcmVxdWlyZWQvPg==",
+            "length" : 25
+          }, {
+            "type" : "SnipSegment",
+            "length" : 2429
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395942834"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6IjJ4MCIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDA5NywibmFtZSI6IlVTRVJOQU1FIn1dLCJpc3N1ZV9kZXRhaWxzX21hcCI6e319",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fwebtools%2Fcontrol%2Flogin:ip=BODY_PARAM_URL_ENCODED%2FUSERNAME:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "13",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "4116567189123576832",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/selectMultipleRelatedValues.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/selectMultipleRelatedValues.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "bWpyZzBnZ2IxZA==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/utilmjrg0ggb1d/selectMultipleRelatedValues.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvdXRpbA==",
+            "length" : 19
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bWpyZzBnZ2IxZA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L3NlbGVjdE11bHRpcGxlUmVsYXRlZFZhbHVlcy5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yOTYzMQ0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 618
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzg5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjA1IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3V0aWw=",
+            "length" : 56
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "bWpyZzBnZ2IxZA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztzZWxlY3RNdWx0aXBsZVJlbGF0ZWRWYWx1ZXMuanNdIGlzIG5vdCBhdmFpbGFibGU8L3A+",
+            "length" : 57
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395945756"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FselectMultipleRelatedValues.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "14",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "3646050686458178560",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/node_modules/moment/min/moment-with-locales.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/node_modules/moment/min/moment-with-locales.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "Y3F3dTFxY28xZg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/node_modulescqwu1qco1f/moment/min/moment-with-locales.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvbm9kZV9tb2R1bGVz",
+            "length" : 27
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Y3F3dTFxY28xZg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L21vbWVudC9taW4vbW9tZW50LXdpdGgtbG9jYWxlcy5qcyBIVFRQLzINCkhvc3Q6IGxvY2FsaG9zdDo4NDQzDQpDYWNoZS1Db250cm9sOiBtYXgtYWdlPTANClNlYy1DSC1VQTogIkdvb2dsZSBDaHJvbWUiO3Y9IjE1MCIsICJOb3Q9QT9CcmFuZCI7dj0iOCIsICJDaHJvbWl1bSI7dj0iMTUwIg0KU2VjLUNILVVBLU1vYmlsZTogPzANClNlYy1DSC1VQS1QbGF0Zm9ybTogIkxpbnV4Ig0KQWNjZXB0LUxhbmd1YWdlOiBlbi1VUztxPTAuOSxlbjtxPTAuOA0KVXNlci1BZ2VudDogTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTUwLjAuMC4wIFNhZmFyaS81MzcuMzYNCkFjY2VwdDogKi8qDQpTZWMtRmV0Y2gtU2l0ZTogbm9uZQ0KU2VjLUZldGNoLU1vZGU6IG5hdmlnYXRlDQpTZWMtRmV0Y2gtVXNlcjogPzENClNlYy1GZXRjaC1EZXN0OiBkb2N1bWVudA0KQWNjZXB0LUVuY29kaW5nOiBnemlwLCBkZWZsYXRlLCBicg0KQ29ubmVjdGlvbjogY2xvc2UNCkNvb2tpZTogT0ZCaXouVmlzaXRvcj0yOTYyNg0KUmVmZXJlcjogaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My93ZWJ0b29scy9jb250cm9sL21haW4NCg0K",
+            "length" : 621
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogODA4DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjA1IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O25vZGVfbW9kdWxlcw==",
+            "length" : 64
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "Y3F3dTFxY28xZg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0Nzttb21lbnQmIzQ3O21pbiYjNDc7bW9tZW50LXdpdGgtbG9jYWxlcy5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 68
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395945842"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fnode_modules%2Fmoment%2Fmin%2Fmoment-with-locales.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "15",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "4522701930216139776",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/fieldlookup.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/fieldlookup.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "cGM3dWd1Mmlydw==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/utilpc7ugu2irw/fieldlookup.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvdXRpbA==",
+            "length" : 19
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cGM3dWd1Mmlydw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L2ZpZWxkbG9va3VwLmpzIEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiAqLyoNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KQ29va2llOiBPRkJpei5WaXNpdG9yPTI5NjM0DQpSZWZlcmVyOiBodHRwczovL2xvY2FsaG9zdDo4NDQzL3dlYnRvb2xzL2NvbnRyb2wvbWFpbg0KDQo=",
+            "length" : 602
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzczDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjA2IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3V0aWw=",
+            "length" : 56
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cGM3dWd1Mmlydw==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztmaWVsZGxvb2t1cC5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 41
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395946219"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2Ffieldlookup.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "16",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "104179443929870336",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/plugins/date/date.timezone-min.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/plugins/date/date.timezone-min.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "NXFpamQ0MXZ6aA==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/plugins5qijd41vzh/date/date.timezone-min.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvcGx1Z2lucw==",
+            "length" : 22
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "NXFpamQ0MXZ6aA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L2RhdGUvZGF0ZS50aW1lem9uZS1taW4uanMgSFRUUC8yDQpIb3N0OiBsb2NhbGhvc3Q6ODQ0Mw0KQ2FjaGUtQ29udHJvbDogbWF4LWFnZT0wDQpTZWMtQ0gtVUE6ICJHb29nbGUgQ2hyb21lIjt2PSIxNTAiLCAiTm90PUE/QnJhbmQiO3Y9IjgiLCAiQ2hyb21pdW0iO3Y9IjE1MCINClNlYy1DSC1VQS1Nb2JpbGU6ID8wDQpTZWMtQ0gtVUEtUGxhdGZvcm06ICJMaW51eCINCkFjY2VwdC1MYW5ndWFnZTogZW4tVVM7cT0wLjksZW47cT0wLjgNClVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE1MC4wLjAuMCBTYWZhcmkvNTM3LjM2DQpBY2NlcHQ6ICovKg0KU2VjLUZldGNoLVNpdGU6IG5vbmUNClNlYy1GZXRjaC1Nb2RlOiBuYXZpZ2F0ZQ0KU2VjLUZldGNoLVVzZXI6ID8xDQpTZWMtRmV0Y2gtRGVzdDogZG9jdW1lbnQNCkFjY2VwdC1FbmNvZGluZzogZ3ppcCwgZGVmbGF0ZSwgYnINCkNvbm5lY3Rpb246IGNsb3NlDQpDb29raWU6IE9GQml6LlZpc2l0b3I9Mjk2NjUNClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9tYWluDQoNCg==",
+            "length" : 613
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzkxDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjA4IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3BsdWdpbnM=",
+            "length" : 59
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "NXFpamQ0MXZ6aA==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztkYXRlJiM0NztkYXRlLnRpbWV6b25lLW1pbi5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 56
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395949057"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fplugins%2Fdate%2Fdate.timezone-min.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "17",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "9037811188340739072",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/util/miscAjaxFunctions.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/util/miscAjaxFunctions.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "cmNiM211b3Nhbg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/utilrcb3muosan/miscAjaxFunctions.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvdXRpbA==",
+            "length" : 19
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cmNiM211b3Nhbg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L21pc2NBamF4RnVuY3Rpb25zLmpzIEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiAqLyoNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KQ29va2llOiBPRkJpei5WaXNpdG9yPTI5Njg3DQpSZWZlcmVyOiBodHRwczovL2xvY2FsaG9zdDo4NDQzL3dlYnRvb2xzL2NvbnRyb2wvbWFpbg0KDQo=",
+            "length" : 608
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzc5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjEwIEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3V0aWw=",
+            "length" : 56
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "cmNiM211b3Nhbg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NzttaXNjQWpheEZ1bmN0aW9ucy5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 47
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395951083"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Futil%2FmiscAjaxFunctions.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "18",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "6605064300186095616",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/plugins/date/FromThruDateCheck.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/plugins/date/FromThruDateCheck.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "d2xvbG5jM2owYg==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/pluginswlolnc3j0b/date/FromThruDateCheck.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvcGx1Z2lucw==",
+            "length" : 22
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "d2xvbG5jM2owYg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L2RhdGUvRnJvbVRocnVEYXRlQ2hlY2suanMgSFRUUC8yDQpIb3N0OiBsb2NhbGhvc3Q6ODQ0Mw0KQ2FjaGUtQ29udHJvbDogbWF4LWFnZT0wDQpTZWMtQ0gtVUE6ICJHb29nbGUgQ2hyb21lIjt2PSIxNTAiLCAiTm90PUE/QnJhbmQiO3Y9IjgiLCAiQ2hyb21pdW0iO3Y9IjE1MCINClNlYy1DSC1VQS1Nb2JpbGU6ID8wDQpTZWMtQ0gtVUEtUGxhdGZvcm06ICJMaW51eCINCkFjY2VwdC1MYW5ndWFnZTogZW4tVVM7cT0wLjksZW47cT0wLjgNClVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE1MC4wLjAuMCBTYWZhcmkvNTM3LjM2DQpBY2NlcHQ6ICovKg0KU2VjLUZldGNoLVNpdGU6IG5vbmUNClNlYy1GZXRjaC1Nb2RlOiBuYXZpZ2F0ZQ0KU2VjLUZldGNoLVVzZXI6ID8xDQpTZWMtRmV0Y2gtRGVzdDogZG9jdW1lbnQNCkFjY2VwdC1FbmNvZGluZzogZ3ppcCwgZGVmbGF0ZSwgYnINCkNvbm5lY3Rpb246IGNsb3NlDQpDb29raWU6IE9GQml6LlZpc2l0b3I9Mjk3MTgNClJlZmVyZXI6IGh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvd2VidG9vbHMvY29udHJvbC9tYWluDQoNCg==",
+            "length" : 613
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogNzkxDQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjE0IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O3BsdWdpbnM=",
+            "length" : 59
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "d2xvbG5jM2owYg==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztkYXRlJiM0NztGcm9tVGhydURhdGVDaGVjay5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 56
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395954571"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fplugins%2Fdate%2FFromThruDateCheck.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  }, {
+    "id" : "19",
+    "type" : "issue_found",
+    "issue" : {
+      "name" : "Input returned in response (reflected)",
+      "type_index" : 4197376,
+      "serial_number" : "3822567890987943936",
+      "origin" : "https://localhost:8443",
+      "path" : "/common/js/node_modules/jquery-validation/dist/localization/messages_en.js",
+      "severity" : "info",
+      "confidence" : "certain",
+      "description" : "The value of the URL path folder 3 is copied into the application's response.",
+      "issue_background" : "<p>Reflection of input arises when data is copied from a request and echoed into the application's immediate response.</p><p>Input being returned in application responses is not a vulnerability in its own right. However, it is a prerequisite for many client-side vulnerabilities, including cross-site scripting, open redirection, content spoofing, and response header injection. Additionally, some server-side vulnerabilities such as SQL injection are often easier to identify and exploit when input is returned in responses. In applications where input retrieval is rare and the environment is resistant to automated testing (for example, due to a web application firewall), it might be worth subjecting instances of it to focused manual testing. </p>",
+      "caption" : "/common/js/node_modules/jquery-validation/dist/localization/messages_en.js [URL path folder 3]",
+      "evidence" : [ {
+        "type" : "FirstOrderEvidence",
+        "detail" : {
+          "payload" : {
+            "bytes" : "MDc0OGl4bjNldQ==",
+            "flags" : 0
+          },
+          "band_flags" : [ "in_band" ]
+        },
+        "request_response" : {
+          "url" : "https://localhost:8443/common/js/node_modules0748ixn3eu/jquery-validation/dist/localization/messages_en.js",
+          "request" : [ {
+            "type" : "DataSegment",
+            "data" : "R0VUIC9jb21tb24vanMvbm9kZV9tb2R1bGVz",
+            "length" : 27
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "MDc0OGl4bjNldQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "L2pxdWVyeS12YWxpZGF0aW9uL2Rpc3QvbG9jYWxpemF0aW9uL21lc3NhZ2VzX2VuLmpzIEhUVFAvMg0KSG9zdDogbG9jYWxob3N0Ojg0NDMNCkNhY2hlLUNvbnRyb2w6IG1heC1hZ2U9MA0KU2VjLUNILVVBOiAiR29vZ2xlIENocm9tZSI7dj0iMTUwIiwgIk5vdD1BP0JyYW5kIjt2PSI4IiwgIkNocm9taXVtIjt2PSIxNTAiDQpTZWMtQ0gtVUEtTW9iaWxlOiA/MA0KU2VjLUNILVVBLVBsYXRmb3JtOiAiTGludXgiDQpBY2NlcHQtTGFuZ3VhZ2U6IGVuLVVTO3E9MC45LGVuO3E9MC44DQpVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNTAuMC4wLjAgU2FmYXJpLzUzNy4zNg0KQWNjZXB0OiAqLyoNClNlYy1GZXRjaC1TaXRlOiBub25lDQpTZWMtRmV0Y2gtTW9kZTogbmF2aWdhdGUNClNlYy1GZXRjaC1Vc2VyOiA/MQ0KU2VjLUZldGNoLURlc3Q6IGRvY3VtZW50DQpBY2NlcHQtRW5jb2Rpbmc6IGd6aXAsIGRlZmxhdGUsIGJyDQpDb25uZWN0aW9uOiBjbG9zZQ0KQ29va2llOiBPRkJpei5WaXNpdG9yPTI5NzUwDQpSZWZlcmVyOiBodHRwczovL2xvY2FsaG9zdDo4NDQzL3dlYnRvb2xzL2NvbnRyb2wvbWFpbg0KDQo=",
+            "length" : 638
+          } ],
+          "response" : [ {
+            "type" : "DataSegment",
+            "data" : "SFRUUC8yIDQwNCBOb3QgRm91bmQNCkNvbnRlbnQtVHlwZTogdGV4dC9odG1sO2NoYXJzZXQ9dXRmLTgNCkNvbnRlbnQtTGFuZ3VhZ2U6IGVuDQpDb250ZW50LUxlbmd0aDogODI5DQpEYXRlOiBUaHUsIDMwIEp1bCAyMDI2IDA3OjE5OjE5IEdNVA0KDQo8IWRvY3R5cGUgaHRtbD48aHRtbCBsYW5nPSJlbiI+PGhlYWQ+PHRpdGxlPkhUVFAgU3RhdHVzIDQwNCDigJMgTm90IEZvdW5kPC90aXRsZT48c3R5bGUgdHlwZT0idGV4dC9jc3MiPmJvZHkge2ZvbnQtZmFtaWx5OlRhaG9tYSxBcmlhbCxzYW5zLXNlcmlmO30gaDEsIGgyLCBoMywgYiB7Y29sb3I6d2hpdGU7YmFja2dyb3VuZC1jb2xvcjojNTI1RDc2Ow==",
+            "length" : 343
+          }, {
+            "type" : "SnipSegment",
+            "length" : 281
+          }, {
+            "type" : "DataSegment",
+            "data" : "PC9iPiBUaGUgcmVxdWVzdGVkIHJlc291cmNlIFsmIzQ3O2NvbW1vbiYjNDc7anMmIzQ3O25vZGVfbW9kdWxlcw==",
+            "length" : 64
+          }, {
+            "type" : "HighlightSegment",
+            "data" : "MDc0OGl4bjNldQ==",
+            "length" : 10
+          }, {
+            "type" : "DataSegment",
+            "data" : "JiM0NztqcXVlcnktdmFsaWRhdGlvbiYjNDc7ZGlzdCYjNDc7bG9jYWxpemF0aW9uJiM0NzttZXNzYWdlc19lbi5qc10gaXMgbm90IGF2YWlsYWJsZTwvcD4=",
+            "length" : 89
+          }, {
+            "type" : "SnipSegment",
+            "length" : 185
+          } ],
+          "was_redirect_followed" : false,
+          "request_time" : "1785395959612"
+        }
+      } ],
+      "internal_data" : "eyJmbGFncyI6MCwidmFyaWFudCI6MCwiaW5zZXJ0aW9uX3BvaW50X2tleSI6Ijd4MiIsImluc2VydGlvbl9wb2ludF9pZGVudGlmaWVycyI6W3sidHlwZV9pbmRleCI6NDEwMiwibmFtZSI6IjMifV0sImlzc3VlX2RldGFpbHNfbWFwIjp7fX0=",
+      "fingerprint" : ":type=INPUT_RETRIEVAL_REFLECTED:path=%2Fcommon%2Fjs%2Fnode_modules%2Fjquery-validation%2Fdist%2Flocalization%2Fmessages_en.js:ip=PATH_FOLDER_PARAM%2F3:origin=https%3A%2F%2Flocalhost%3A8443"
+    }
+  } ],
+  "task_id" : "3",
+  "scan_status" : "auditing",
+  "message" : "",
+  "error_code" : 0
+}

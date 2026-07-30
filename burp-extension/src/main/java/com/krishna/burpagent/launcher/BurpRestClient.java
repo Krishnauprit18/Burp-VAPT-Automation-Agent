@@ -136,13 +136,6 @@ final class BurpRestClient {
                 "^\\Q" + config.targetHost() + "\\E$",
                 "^" + config.targetPort() + "$",
                 "(?i)^/[^/]+/control/logout(?:/.*)?$"));
-        exclude.add(scopeRule(
-                "^\\Q" + config.targetHost() + "\\E$",
-                "^" + config.targetPort() + "$",
-                "(?i)^/(?:webtools/control/(?:ListLocales|setSessionLocale|setUserLocale|"
-                        + "ListVisualThemes|selectTheme|setUserPreference)|"
-                        + "common-js/control/SetTimeZoneFromBrowser)$"));
-
         ObjectNode login = scan.putArray("application_logins").addObject();
         login.put("type", "UsernameAndPasswordLogin");
         login.put("username", config.username());

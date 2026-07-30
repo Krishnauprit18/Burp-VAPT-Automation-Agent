@@ -13,9 +13,9 @@ final class ConfigurationServiceTest {
 
         assertTrue(json.contains("(?i)^/ecommerce(?:/.*)?$"));
         assertTrue(json.contains("(?i)^/[^/]+/control/logout(?:/.*)?$"));
-        assertTrue(json.contains("ListLocales|setSessionLocale|setUserLocale"));
-        assertTrue(json.contains("ListVisualThemes|selectTheme|setUserPreference"));
-        assertTrue(json.contains("common-js/control/SetTimeZoneFromBrowser"));
+        assertFalse(json.contains("ListLocales|setSessionLocale|setUserLocale"));
+        assertFalse(json.contains("ListVisualThemes|selectTheme|setUserPreference"));
+        assertFalse(json.contains("common-js/control/SetTimeZoneFromBrowser"));
         assertTrue(json.contains("\"file\": \"^/.*\""));
         assertFalse(json.contains("non-WebTools"));
         assertFalse(json.contains("forgotPassword"));

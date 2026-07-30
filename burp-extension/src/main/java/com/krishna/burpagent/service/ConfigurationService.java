@@ -67,10 +67,6 @@ public class ConfigurationService {
         return target.isLoginPath(path);
     }
 
-    public boolean isCrawlerNavigationTrap(String path) {
-        return target.isCrawlerNavigationTrap(path);
-    }
-
     public boolean usesPrimaryApplicationSession(String path) {
         return target.usesPrimaryApplicationSession(path);
     }
@@ -100,7 +96,7 @@ public class ConfigurationService {
         try {
             api.burpSuite().importProjectOptionsFromJson(optionsJson);
             String msg = "Burp project configuration loaded with WebTools seed, "
-                    + "Ecommerce exclusion, and logout protection for " + targetUrl();
+                    + "Ecommerce exclusion, and logout exclusion for " + targetUrl();
             logDiagnostics(msg);
             api.logging().logToOutput(msg);
         } catch (Exception e) {
@@ -141,20 +137,12 @@ public class ConfigurationService {
                   "port": "^%d$",
                   "protocol": "https",
                   "file": "(?i)^/[^/]+/control/logout(?:/.*)?$"
-                },
-                {
-                  "enabled": true,
-                  "host": "%s",
-                  "port": "^%d$",
-                  "protocol": "https",
-                  "file": "(?i)^/(?:webtools/control/(?:ListLocales|setSessionLocale|setUserLocale|ListVisualThemes|selectTheme|setUserPreference)|common-js/control/SetTimeZoneFromBrowser)$"
                 }
               ]
             }
           }
         }
         """, jsonEscape(hostPattern), port,
-                jsonEscape(hostPattern), port,
                 jsonEscape(hostPattern), port,
                 jsonEscape(hostPattern), port);
     }

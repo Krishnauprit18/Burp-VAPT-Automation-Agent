@@ -34,15 +34,11 @@ public class SessionAuthenticationHandler implements HttpHandler {
                 return RequestToBeSentAction.continueWith(requestToBeSent);
             }
             if (!configService.isAllowedPath(path)) {
-                configService.logDiagnostics(
-                        "[Scope agent] Blocked explicitly excluded Ecommerce request: " + path);
-                return RequestToBeSentAction.drop();
+                return RequestToBeSentAction.continueWith(requestToBeSent);
             }
 
             if (configService.isLogoutPath(path)) {
-                configService.logDiagnostics(
-                        "[Session agent] Blocked crawler request to a logout endpoint: " + path);
-                return RequestToBeSentAction.drop();
+                return RequestToBeSentAction.continueWith(requestToBeSent);
             }
 
             if (configService.isLoginPath(path)) {
@@ -63,9 +59,11 @@ public class SessionAuthenticationHandler implements HttpHandler {
                 return RequestToBeSentAction.continueWith(requestToBeSent);
             }
 
-            String sessionId = sessionCoordinator.shouldInjectAgentSession()
-                    ? authenticationService.currentSessionId()
-                    : sessionCoordinator.burpSessionId();
+            if (!sessionCoordinator.shouldInjectAgentSession()) {
+                return RequestToBeSentAction.continueWith(requestToBeSent);
+            }
+
+            String sessionId = authenticationService.currentSessionId();
             if (!sessionId.isEmpty()) {
                 HttpRequest modifiedRequest = requestToBeSent;
                 String existingCookieHeader = requestToBeSent.headerValue("Cookie");

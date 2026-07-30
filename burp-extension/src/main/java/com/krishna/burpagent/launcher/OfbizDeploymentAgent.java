@@ -24,6 +24,11 @@ final class OfbizDeploymentAgent {
     }
 
     void deployAndWait() throws Exception {
+        if (isReady()) {
+            System.out.println("[OFBiz agent] Existing healthy OFBiz target reused at "
+                    + config.targetUrl() + ".");
+            return;
+        }
         System.out.println("[OFBiz agent] Building and starting the OFBiz demo container...");
         commands.run(
                 List.of("docker", "compose", "up", "--detach", "--build", "ofbiz"),
@@ -37,20 +42,24 @@ final class OfbizDeploymentAgent {
         String readinessUrl = config.targetUrl();
         Instant deadline = Instant.now().plus(config.ofbizStartupTimeout());
         while (Instant.now().isBefore(deadline)) {
-            try {
-                HttpsURLConnection connection = open(readinessUrl);
-                int status = connection.getResponseCode();
-                connection.disconnect();
-                if (status < 500) {
-                    System.out.println("[OFBiz agent] Ready at " + readinessUrl + " (HTTP " + status + ")");
-                    return;
-                }
-            } catch (IOException ignored) {
-                // OFBiz is still starting.
+            if (isReady()) {
+                System.out.println("[OFBiz agent] Ready at " + readinessUrl);
+                return;
             }
             Thread.sleep(5_000);
         }
         throw new IOException("OFBiz did not become ready before " + config.ofbizStartupTimeout());
+    }
+
+    private boolean isReady() throws GeneralSecurityException {
+        try {
+            HttpsURLConnection connection = open(config.targetUrl());
+            int status = connection.getResponseCode();
+            connection.disconnect();
+            return status < 500;
+        } catch (IOException ignored) {
+            return false;
+        }
     }
 
     private HttpsURLConnection open(String value) throws IOException, GeneralSecurityException {

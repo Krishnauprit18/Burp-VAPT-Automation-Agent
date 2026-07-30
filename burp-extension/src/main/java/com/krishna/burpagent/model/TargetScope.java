@@ -5,15 +5,8 @@ import java.util.Locale;
 
 public record TargetScope(String url, String host, int port) {
     public static final String DEFAULT_URL = "https://localhost:8443/webtools/control/main";
+
     private static final String ECOMMERCE_PREFIX = "/ecommerce/";
-    private static final java.util.Set<String> CRAWLER_NAVIGATION_TRAPS = java.util.Set.of(
-            "/webtools/control/listlocales",
-            "/webtools/control/setsessionlocale",
-            "/webtools/control/setuserlocale",
-            "/webtools/control/listvisualthemes",
-            "/webtools/control/selecttheme",
-            "/webtools/control/setuserpreference",
-            "/common-js/control/settimezonefrombrowser");
 
     public static TargetScope webTools(String value) {
         URI uri;
@@ -52,11 +45,6 @@ public record TargetScope(String url, String host, int port) {
         if (path == null) return false;
         String normalized = path.toLowerCase(Locale.ROOT);
         return normalized.matches("^/[^/]+/control/login(?:/.*)?$");
-    }
-
-    public boolean isCrawlerNavigationTrap(String path) {
-        if (path == null) return false;
-        return CRAWLER_NAVIGATION_TRAPS.contains(path.toLowerCase(Locale.ROOT));
     }
 
     public boolean usesPrimaryApplicationSession(String path) {

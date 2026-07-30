@@ -57,22 +57,6 @@ final class TargetScopeTest {
     }
 
     @Test
-    void identifiesOnlyObservedStateChangingCrawlerNavigationTraps() {
-        TargetScope target = TargetScope.webTools(TargetScope.DEFAULT_URL);
-
-        assertTrue(target.isCrawlerNavigationTrap("/webtools/control/ListLocales"));
-        assertTrue(target.isCrawlerNavigationTrap("/WEBTOOLS/control/setSessionLocale"));
-        assertTrue(target.isCrawlerNavigationTrap("/webtools/control/setUserLocale"));
-        assertTrue(target.isCrawlerNavigationTrap("/webtools/control/ListVisualThemes"));
-        assertTrue(target.isCrawlerNavigationTrap("/webtools/control/selectTheme"));
-        assertTrue(target.isCrawlerNavigationTrap("/webtools/control/setUserPreference"));
-        assertTrue(target.isCrawlerNavigationTrap("/common-js/control/SetTimeZoneFromBrowser"));
-        assertFalse(target.isCrawlerNavigationTrap("/webtools/control/main"));
-        assertFalse(target.isCrawlerNavigationTrap("/accounting/control/main"));
-        assertFalse(target.isCrawlerNavigationTrap("/webtools/control/entitymaint"));
-    }
-
-    @Test
     void limitsStandbySessionInjectionToTheWebtoolsServletContext() {
         TargetScope target = TargetScope.webTools(TargetScope.DEFAULT_URL);
 

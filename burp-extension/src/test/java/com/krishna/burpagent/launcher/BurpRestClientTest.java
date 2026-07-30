@@ -32,6 +32,9 @@ final class BurpRestClientTest {
         assertEquals("AdvancedScope", request.path("scope").path("type").asText());
         assertEquals("^/.*", request.path("scope").path("include").get(0).path("file").asText());
         assertTrue(request.path("scope").path("exclude").toString().contains("ecommerce"));
+        assertTrue(request.path("scope").path("exclude").toString().contains("logout"));
+        assertEquals(2, request.path("scope").path("exclude").size());
+        assertFalse(request.path("scope").path("exclude").toString().contains("SetTimeZoneFromBrowser"));
         assertEquals(
                 "UsernameAndPasswordLogin",
                 request.path("application_logins").get(0).path("type").asText());

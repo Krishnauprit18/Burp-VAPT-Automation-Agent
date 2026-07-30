@@ -8,7 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class CrawlerSessionCoordinatorTest {
     @Test
-    void waitsForBurpCredentialLoginWithoutInjectingTheAgentSession() {
+    void startsInRecoveryModeForRestoredBurpTasks() {
+        CrawlerSessionCoordinator coordinator = new CrawlerSessionCoordinator();
+
+        assertEquals(
+                CrawlerSessionCoordinator.Mode.AGENT_RECOVERY_SESSION,
+                coordinator.mode());
+        assertTrue(coordinator.shouldInjectAgentSession());
+    }
+
+    @Test
+    void freshScanPreparationWaitsForBurpCredentialLogin() {
         CrawlerSessionCoordinator coordinator = new CrawlerSessionCoordinator();
 
         coordinator.beginCredentialLogin();

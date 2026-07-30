@@ -24,17 +24,18 @@ The production flow is:
 4. `BurpRestClient` creates a native crawl-and-audit task with:
    - the single WebTools seed;
    - Burp's native username/password application login using `admin/ofbiz`;
-   - all paths on `localhost:8443` in scope except Ecommerce, logout endpoints,
-     and known state-changing locale/theme/time-zone navigation loops.
+   - all paths on `localhost:8443` in scope except Ecommerce and logout
+     endpoints.
 5. Burp owns crawl depth, duration, audit strategy, and task completion. The
    agent does not use a scan timeout, inactivity cutoff, or synthetic
    completion heuristic.
 6. The launcher polls Burp's genuine REST task status and persists the complete
    response in `scan-status.json`.
-7. The Montoya HTTP handler observes Burp's credential login. If that
-   established WebTools session is later rejected, it injects the verified
-   standby `JSESSIONID`; if the standby session has expired, it logs in again
-   and replaces it.
+7. The Montoya HTTP handler observes Burp's credential login without replacing
+   Burp's cookies. If that established WebTools session is later rejected, or
+   the extension is reloaded while restoring an existing task, it injects the
+   verified standby `JSESSIONID`; if the standby session has expired, it logs
+   in again and replaces it.
 8. Only after REST reports `succeeded`, Montoya asks Burp itself to generate
    original HTML and XML reports.
 
@@ -136,9 +137,11 @@ configured credential submission as the crawler's authenticated session.
 OFBiz issues `JSESSIONID` dynamically; no static ID is configured. A background
 agent-created session is verified against
 `/webtools/control/entitymaint`. It is used only as recovery after Burp's
-credential session has been established and subsequently rejected. Recovery
-refresh is single-flight, so concurrent scanner requests cannot trigger a
-login storm.
+credential session has been established and subsequently rejected, or
+immediately after an extension reload restores an already-running task. A
+fresh scan explicitly returns to Burp credential-login mode before task
+creation. Recovery refresh is single-flight, so concurrent scanner requests
+cannot trigger a login storm.
 
 ## Why both REST and Montoya are required
 

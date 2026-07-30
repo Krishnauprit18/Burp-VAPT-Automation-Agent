@@ -9,8 +9,11 @@ public final class CrawlerSessionCoordinator {
         AGENT_RECOVERY_SESSION
     }
 
+    // A fresh pipeline explicitly calls beginCredentialLogin(). If Burp
+    // reloads this extension while restoring an existing task, no new login
+    // event is guaranteed, so the restart-safe default is recovery mode.
     private final AtomicReference<Mode> mode =
-            new AtomicReference<>(Mode.AWAITING_BURP_CREDENTIAL_LOGIN);
+            new AtomicReference<>(Mode.AGENT_RECOVERY_SESSION);
     private final AtomicReference<String> burpSessionId = new AtomicReference<>("");
 
     public void beginCredentialLogin() {
