@@ -52,6 +52,17 @@ final class MontoyaBridgeClient {
         System.out.println("[Session agent] Standby OFBiz session and Montoya recovery are ready.");
     }
 
+    /**
+     * Lightweight session refresh used when resuming an existing scan task.
+     * Re-establishes the standby OFBiz session without resetting project scope
+     * or login configuration (those are already stored in the .burp project).
+     */
+    void prepareResumedScan() throws Exception {
+        HttpResponse<String> response = send("POST", "/scan/prepare", Duration.ofMinutes(2));
+        requireSuccess(response, "refresh Montoya session for resumed scan");
+        System.out.println("[Session agent] Session refreshed for resumed scan.");
+    }
+
     String generateReports(String scanId, Path runDirectory) throws Exception {
         HttpResponse<String> response = send(
                 "POST", "/scan/report?id=" + encode(scanId), Duration.ofMinutes(5));

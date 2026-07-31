@@ -1,0 +1,11 @@
+{
+    "application_login":{
+        "credentials":[
+            {
+                "label":"ofbiz-cred",
+                "password":"ofbiz",
+                "username":"admin"
+            }
+        ]
+    }
+}

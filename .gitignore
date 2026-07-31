@@ -14,3 +14,4 @@ artifacts/
 *.log
 !saved-projects/**/*.log
 .DS_Store
+Saved-Projects/

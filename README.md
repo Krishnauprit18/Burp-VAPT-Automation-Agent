@@ -94,10 +94,20 @@ Validate configuration without starting Docker or Burp:
 java -jar burp-extension/target/burp-agent-bridge.jar --check
 ```
 
-Start the complete pipeline:
+Start the complete pipeline (fresh run):
 
 ```bash
 java -jar burp-extension/target/burp-agent-bridge.jar
+```
+
+Resume the previous run session (or specify a specific run directory name):
+
+```bash
+# Resumes latest run in artifacts/
+java -jar burp-extension/target/burp-agent-bridge.jar --resume
+
+# Resumes a specific run directory (e.g. run-20260730-170923)
+java -jar burp-extension/target/burp-agent-bridge.jar --resume run-20260730-170923
 ```
 
 Stop the project-managed Burp/OFBiz runtime and delete generated artifacts:

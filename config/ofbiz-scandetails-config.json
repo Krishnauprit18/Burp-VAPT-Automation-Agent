@@ -1,0 +1,30 @@
+{
+    "scope":{
+        "advanced_mode":true,
+        "exclude":[
+            {
+                "enabled":true,
+                "file":"(?i)^/[^/]+/control/logout(?:/.*)?$",
+                "host":"^localhost$",
+                "port":"^8443$",
+                "protocol":"any"
+            },
+            {
+                "enabled":true,
+                "file":"(?i)^/ecommerce(?:/.*)?$",
+                "host":"^localhost$",
+                "port":"^8443$",
+                "protocol":"any"
+            }
+        ],
+        "include":[
+            {
+                "enabled":true,
+                "file":"^/.*",
+                "host":"^localhost$",
+                "port":"^8443$",
+                "protocol":"any"
+            }
+        ]
+    }
+}

@@ -16,7 +16,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class BurpRestClient {
     private static final Set<String> TERMINAL_STATUSES = Set.of("succeeded", "failed");
@@ -74,7 +76,38 @@ final class BurpRestClient {
         return new ScanTask(taskId, apiRoot.resolve("scan/" + taskId));
     }
 
-    ScanProgress awaitCompletion(ScanTask task, Path runDirectory) throws Exception {
+    /**
+     * Tries to attach to an already-running or paused Burp scan task by its
+     * saved task ID, without issuing a new {@code POST /scan}.
+     *
+     * <p>Returns a populated {@link ScanTask} when the REST API confirms the
+     * task is still known; returns empty when the task ID is stale (e.g. Burp
+     * was fully quit and the project was never restored).
+     */
+    Optional<ScanTask> tryAttachExistingTask(String taskId) {
+        try {
+            URI statusUri = apiRoot.resolve("scan/" + taskId);
+            HttpResponse<String> response = send(statusUri, "GET");
+            if (response.statusCode() != 200) return Optional.empty();
+            JsonNode root = JSON.readTree(response.body());
+            String status = root.path("scan_status").asText("");
+            if (status.isBlank()) return Optional.empty();
+            System.out.println("[Burp REST agent] Attached to existing task " + taskId
+                    + " (status: " + status + ")");
+            return Optional.of(new ScanTask(taskId, statusUri));
+        } catch (Exception ignored) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Polls the Burp REST task until it reaches a terminal status.
+     *
+     * @param lastProgressRef updated on every poll so the shutdown hook in
+     *                        {@link MasterPipelineAgent} can persist fresh state on Ctrl+C.
+     */
+    ScanProgress awaitCompletion(ScanTask task, Path runDirectory,
+            AtomicReference<ScanProgress> lastProgressRef) throws Exception {
         String previousStatus = "";
         int previousProgress = -1;
         while (true) {
@@ -85,6 +118,7 @@ final class BurpRestClient {
 
             JsonNode root = JSON.readTree(response.body());
             ScanProgress progress = ScanProgress.from(root);
+            lastProgressRef.set(progress);   // always keep fresh for shutdown hook
             Files.writeString(
                     runDirectory.resolve("scan-status.json"),
                     JSON.writerWithDefaultPrettyPrinter().writeValueAsString(root),
@@ -119,41 +153,55 @@ final class BurpRestClient {
         scan.putArray("urls").add(config.targetUrl());
         scan.put("protocol_option", "specified");
 
-        ObjectNode scope = scan.putObject("scope");
-        scope.put("type", "AdvancedScope");
-        ArrayNode include = scope.putArray("include");
-        include.add(scopeRule(
-                "^\\Q" + config.targetHost() + "\\E$",
-                "^" + config.targetPort() + "$",
-                "^/.*"));
-
-        ArrayNode exclude = scope.putArray("exclude");
-        exclude.add(scopeRule(
-                "^\\Q" + config.targetHost() + "\\E$",
-                "^" + config.targetPort() + "$",
-                "(?i)^/ecommerce(?:/.*)?$"));
-        exclude.add(scopeRule(
-                "^\\Q" + config.targetHost() + "\\E$",
-                "^" + config.targetPort() + "$",
-                "(?i)^/[^/]+/control/logout(?:/.*)?$"));
+        // 1. Application Logins
         ObjectNode login = scan.putArray("application_logins").addObject();
         login.put("type", "UsernameAndPasswordLogin");
-        login.put("username", config.username());
-        login.put("password", config.password());
         login.put("label", "OFBiz administrator");
 
-        // Intentionally omit scan_configurations. Burp's native default
-        // crawl-and-audit configuration owns scan depth, quality and duration.
-        return scan;
-    }
+        java.nio.file.Path configDir = config.projectRoot().resolve("config");
+        java.nio.file.Path credPath = configDir.resolve("ofbiz-credConfig.json");
+        boolean credsLoaded = false;
+        if (java.nio.file.Files.isRegularFile(credPath)) {
+            try {
+                String credJson = java.nio.file.Files.readString(credPath, java.nio.charset.StandardCharsets.UTF_8);
+                com.fasterxml.jackson.databind.JsonNode credNode = JSON.readTree(credJson);
+                com.fasterxml.jackson.databind.JsonNode credentials = credNode.path("application_login").path("credentials");
+                if (credentials.isArray() && credentials.size() > 0) {
+                    com.fasterxml.jackson.databind.JsonNode firstCred = credentials.get(0);
+                    login.put("username", firstCred.path("username").asText(config.username()));
+                    login.put("password", firstCred.path("password").asText(config.password()));
+                    credsLoaded = true;
+                    System.out.println("[Master agent] Loaded credentials from config/ofbiz-credConfig.json");
+                }
+            } catch (Exception e) {
+                System.err.println("[Master agent] Failed to parse ofbiz-credConfig.json: " + e.getMessage());
+            }
+        }
+        if (!credsLoaded) {
+            login.put("username", config.username());
+            login.put("password", config.password());
+        }
 
-    private static ObjectNode scopeRule(String host, String port, String file) {
-        ObjectNode rule = JSON.createObjectNode();
-        rule.put("protocol", "https");
-        rule.put("host_or_ip_range", host);
-        rule.put("port", port);
-        rule.put("file", file);
-        return rule;
+        // 2. Scan Configurations
+        ArrayNode scanConfigs = scan.putArray("scan_configurations");
+
+        String[] configFiles = {"ofbiz-scanConfig.json", "ofbiz-scandetails-config.json"};
+        for (String file : configFiles) {
+            java.nio.file.Path path = configDir.resolve(file);
+            if (java.nio.file.Files.isRegularFile(path)) {
+                try {
+                    String content = java.nio.file.Files.readString(path, java.nio.charset.StandardCharsets.UTF_8);
+                    scanConfigs.addObject()
+                            .put("type", "CustomConfiguration")
+                            .put("config", content);
+                    System.out.println("[Master agent] Loaded " + file + " into scan_configurations.");
+                } catch (Exception e) {
+                    System.err.println("[Master agent] Failed to load " + file + ": " + e.getMessage());
+                }
+            }
+        }
+
+        return scan;
     }
 
     private HttpResponse<String> send(String method, String relativePath, String body)

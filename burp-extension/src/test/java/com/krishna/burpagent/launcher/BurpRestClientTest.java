@@ -19,7 +19,7 @@ final class BurpRestClientTest {
     Path tempDirectory;
 
     @Test
-    void buildsNativeAuthenticatedCrawlAndAuditWithoutAgentScanLimits() throws Exception {
+    void buildsNativeAuthenticatedCrawlAndAuditWithCustomConfigurations() throws Exception {
         AgentConfiguration config = configuration();
 
         JsonNode request = BurpRestClient.buildScanRequest(config);
@@ -29,20 +29,20 @@ final class BurpRestClientTest {
                 request.path("urls").get(0).asText());
         assertFalse(request.has("name"));
         assertEquals("specified", request.path("protocol_option").asText());
-        assertEquals("AdvancedScope", request.path("scope").path("type").asText());
-        assertEquals("^/.*", request.path("scope").path("include").get(0).path("file").asText());
-        assertTrue(request.path("scope").path("exclude").toString().contains("ecommerce"));
-        assertTrue(request.path("scope").path("exclude").toString().contains("logout"));
-        assertEquals(2, request.path("scope").path("exclude").size());
-        assertFalse(request.path("scope").path("exclude").toString().contains("SetTimeZoneFromBrowser"));
+        
+        // Scope is no longer built manually
+        assertTrue(request.path("scope").isMissingNode());
+        
+        // Application login defaults to .env if json doesn't exist
         assertEquals(
                 "UsernameAndPasswordLogin",
                 request.path("application_logins").get(0).path("type").asText());
         assertEquals("admin", request.path("application_logins").get(0).path("username").asText());
         assertEquals("ofbiz", request.path("application_logins").get(0).path("password").asText());
-        assertFalse(request.has("scan_configurations"));
-        assertFalse(request.toString().contains("maximum_crawl_time"));
-        assertFalse(request.toString().contains("maximum_crawl_and_audit_time"));
+        
+        // Custom configs should be empty since we didn't create them in the test's temp config dir
+        assertTrue(request.has("scan_configurations"));
+        assertEquals(0, request.path("scan_configurations").size());
     }
 
     @Test
